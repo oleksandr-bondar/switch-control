@@ -119,10 +119,6 @@ namespace SwitchApp
             if (_knobLastPos.HasValue)
             {
                 _knobLastPos = null;
-                storyboardFill.Stop();
-
-                knobGS1.Color = knobGS2.Color = _knobColor;
-                knobGS1.Offset = knobGS2.Offset = 0.0;
 
                 double value = 100 * knobTransform.X / _knobMaxX;
 
@@ -135,27 +131,7 @@ namespace SwitchApp
             if (!_knobLastPos.HasValue)
             {
                 var point = prea.GetCurrentPoint(grid).Position;
-                var knobPnt = prea.GetCurrentPoint(knob).Position;
-                var knobOffsetX = Math.Min(0.75, knobPnt.X / _knobSize);
-                var knobOffsetY = Math.Min(0.75, knobPnt.Y / _knobSize);
 
-                knobGradient.StartPoint = new Point(knobOffsetX, knobOffsetY);
-
-                var rectColor = (grid.Background as SolidColorBrush).Color;
-                var knobColor = _knobColor;
-
-                Color newColor = Color.FromArgb(255,
-                    (byte)((rectColor.R + knobColor.R) / 2),
-                    (byte)((rectColor.G + knobColor.G) / 2),
-                    (byte)((rectColor.B + knobColor.B) / 2));
-
-                knobGS1.Color = newColor;
-                knobGS2.Color = _knobColor;
-
-                storyboardFillColorAnim.From = _knobColor;
-                storyboardFillColorAnim.To = newColor;
-
-                storyboardFill.Begin();
                 _knobLastPos = point;
             }
         }
@@ -205,7 +181,45 @@ namespace SwitchApp
 
             }
         }
-        
+
+        private void knob_Loaded(object sender, RoutedEventArgs e)
+        {
+            //storyboardTest.Begin();
+        }
+
+        private void knob_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            //var point = e.GetCurrentPoint(grid).Position;
+            var knobPnt = e.GetCurrentPoint(knob).Position;
+            var knobOffsetX = Math.Min(0.75, knobPnt.X / _knobSize);
+            var knobOffsetY = Math.Min(0.75, knobPnt.Y / _knobSize);
+
+            knobGradient.StartPoint = new Point(knobOffsetX, 0);
+
+            var rectColor = (grid.Background as SolidColorBrush).Color;
+            var knobColor = _knobColor;
+
+            Color newColor = Color.FromArgb(255,
+                (byte)((rectColor.R + knobColor.R) / 2),
+                (byte)((rectColor.G + knobColor.G) / 2),
+                (byte)((rectColor.B + knobColor.B) / 2));
+
+            knobGS1.Color = newColor;
+            knobGS2.Color = _knobColor;
+
+            storyboardFillColorAnim.From = _knobColor;
+            storyboardFillColorAnim.To = newColor;
+
+            storyboardFill.Begin();
+        }
+
+        private void knob_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            storyboardFill.Stop();
+            knobGS1.Color = knobGS2.Color = _knobColor;
+            knobGS1.Offset = knobGS2.Offset = 0.0;
+        }
+
         //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
         //{
         //    //storyboardShine.Stop();
