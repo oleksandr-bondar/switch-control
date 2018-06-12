@@ -24,7 +24,7 @@ namespace SwitchApp
         public string Text { get; set; }
         public Color BackgroundColor { get; set; }
         public Thickness KnobPadding { get; private set; } = new Thickness(5);
-        public double Offset { get; set; }
+        public double Offset => 100 * knobTransform.X / _knobMaxX;
         public bool Checked { get; set; }
 
         new public double Width { get => grid.Width; set { grid.Width = value; InitLayout(); } }
@@ -42,8 +42,7 @@ namespace SwitchApp
             ValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private Point? knobLastPos;
-        private Color knobBackColor;
+        private Point? _knobLastPos;
 
         private double _width;
         private double _height;
@@ -53,6 +52,7 @@ namespace SwitchApp
         private double _knobPadding;
         private double _knobMinX;
         private double _knobMaxX;
+        private Color _knobColor;
 
         public SwitchControl()
         {
@@ -85,12 +85,12 @@ namespace SwitchApp
             var currPos = e.GetCurrentPoint(grid).Position;
             var x = currPos.X;
 
-            if (knobLastPos.HasValue && knobLastPos.Value.X != currPos.X)
+            if (_knobLastPos.HasValue && _knobLastPos.Value.X != currPos.X)
             {
-                var diff = knobLastPos.Value.X - x;
+                var diff = _knobLastPos.Value.X - x;
 
                 SetKnobPosition(knobTransform.X - diff);
-                knobLastPos = currPos;
+                _knobLastPos = currPos;
             }
         }
 
@@ -106,7 +106,7 @@ namespace SwitchApp
 
         private void Knob_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            CaptureKnob(e.GetCurrentPoint(grid).Position);
+            CaptureKnob(e);
         }
 
         private void Knob_PointerReleased(object sender, PointerRoutedEventArgs e)
@@ -116,10 +116,13 @@ namespace SwitchApp
 
         private void FreeKnob()
         {
-            if (knobLastPos.HasValue)
+            if (_knobLastPos.HasValue)
             {
-                knobLastPos = null;
-                (knob.Fill as SolidColorBrush).Color = knobBackColor;
+                _knobLastPos = null;
+                storyboardFill.Stop();
+
+                knobGS1.Color = knobGS2.Color = _knobColor;
+                knobGS1.Offset = knobGS2.Offset = 0.0;
 
                 double value = 100 * knobTransform.X / _knobMaxX;
 
@@ -127,22 +130,33 @@ namespace SwitchApp
             }
         }
 
-        private void CaptureKnob(Point point)
+        private void CaptureKnob(PointerRoutedEventArgs prea)
         {
-            if (!knobLastPos.HasValue)
+            if (!_knobLastPos.HasValue)
             {
-                //knob.Opacity = 0.5;
+                var point = prea.GetCurrentPoint(grid).Position;
+                var knobPnt = prea.GetCurrentPoint(knob).Position;
+                var knobOffsetX = Math.Min(0.75, knobPnt.X / _knobSize);
+                var knobOffsetY = Math.Min(0.75, knobPnt.Y / _knobSize);
+
+                knobGradient.StartPoint = new Point(knobOffsetX, knobOffsetY);
+
                 var rectColor = (grid.Background as SolidColorBrush).Color;
-                var knobColor = (knob.Fill as SolidColorBrush).Color;
-                knobBackColor = knobColor;
+                var knobColor = _knobColor;
 
                 Color newColor = Color.FromArgb(255,
                     (byte)((rectColor.R + knobColor.R) / 2),
                     (byte)((rectColor.G + knobColor.G) / 2),
                     (byte)((rectColor.B + knobColor.B) / 2));
 
-                (knob.Fill as SolidColorBrush).Color = newColor;
-                knobLastPos = point;
+                knobGS1.Color = newColor;
+                knobGS2.Color = _knobColor;
+
+                storyboardFillColorAnim.From = _knobColor;
+                storyboardFillColorAnim.To = newColor;
+
+                storyboardFill.Begin();
+                _knobLastPos = point;
             }
         }
 
@@ -157,6 +171,7 @@ namespace SwitchApp
             _knobPadding = (_height - _knobSize) / 2;
             _knobMinX = 0.0;// _knobPadding;
             _knobMaxX = _width - (_knobSize + _knobPadding * 2);
+            _knobColor = knobGS2.Color;
 
             grid.Height = _height;
             grid.CornerRadius = new CornerRadius(_cornerRadius);
@@ -190,7 +205,7 @@ namespace SwitchApp
 
             }
         }
-
+        
         //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
         //{
         //    //storyboardShine.Stop();

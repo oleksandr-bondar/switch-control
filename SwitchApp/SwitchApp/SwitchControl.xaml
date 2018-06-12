@@ -9,7 +9,7 @@
     d:DesignHeight="50"
     d:DesignWidth="150">
 
-    <Grid x:Name="grid" CornerRadius="25" Background="DarkOrange" Width="150" Height="50">
+    <Grid x:Name="grid" CornerRadius="25" Background="Orange" Width="150" Height="50">
         <Grid.Resources>
             <Storyboard x:Name="storyboardShine">
                 <DoubleAnimationUsingKeyFrames x:Name="storyboardShineDA"
@@ -24,18 +24,23 @@
                     </EasingDoubleKeyFrame>
                 </DoubleAnimationUsingKeyFrames>
             </Storyboard>
+
+            <Storyboard x:Name="storyboardFill">
+                <DoubleAnimation Storyboard.TargetName="knobGS2"
+                                 Storyboard.TargetProperty="Offset" 
+                                 EnableDependentAnimation="True" Duration="0:0:0.5"
+                                 From="0.0" To="1.0">
+                </DoubleAnimation>
+                <ColorAnimation x:Name="storyboardFillColorAnim" Storyboard.TargetName="knobGS2" Storyboard.TargetProperty="Color"
+                                EnableDependentAnimation="True" Duration="0:0:0.1" BeginTime="0:0:0.4">
+                </ColorAnimation>
+            </Storyboard>
             
             <Storyboard x:Name="storyboardTrue">
-                <!--<DrillInThemeAnimation>
-                    
-                </DrillInThemeAnimation>
-                <PointAnimation></PointAnimation>
-                <RepositionThemeAnimation>
-                </RepositionThemeAnimation>-->
                 <DoubleAnimation x:Name="storyboardTrueDA"
                    Storyboard.TargetName="knobTransform"
                    Storyboard.TargetProperty="X" 
-                    Duration="0:0:4" SpeedRatio="1.0" >
+                    Duration="0:0:0.5" SpeedRatio="1.0" >
                     <!--<DoubleAnimation.EasingFunction>
                         --><!--<BounceEase Bounces="2" Bounciness="2" EasingMode="EaseIn"/>-->
                         <!--<ElasticEase Oscillations="3" Springiness="1" EasingMode="EaseIn" />--><!--
@@ -43,10 +48,15 @@
                 </DoubleAnimation>
             </Storyboard>
 
-            <Storyboard x:Name="storyboardFalse">
-                
+            <Storyboard x:Name="storyboardCircle">
+                <DoubleAnimation 
+                    Storyboard.TargetName="knob"
+                    Storyboard.TargetProperty="Width"
+                    From="40" To="140"
+                    Duration="0:0:1" SpeedRatio="1.0" AutoReverse="False" EnableDependentAnimation="True">
+                </DoubleAnimation>
             </Storyboard>
-
+            
             <Style x:Key="DisabledControl" TargetType="FrameworkElement">
                 <Setter Property="AllowFocusOnInteraction" Value="False" />
                 <Setter Property="IsDoubleTapEnabled" Value="False" />
@@ -80,11 +90,17 @@
                    Style="{StaticResource DisabledControl}">
         </TextBlock>
 
-        <Rectangle x:Name="knob" Width="40" Height="40" Margin="5" 
-                       Fill="White" RadiusX="20" RadiusY="20" HorizontalAlignment="Left" >
+        <Rectangle x:Name="knob" Width="40" Height="40" Margin="5"
+                       RadiusX="20" RadiusY="20" HorizontalAlignment="Left" >
             <Rectangle.RenderTransform>
                 <TranslateTransform x:Name="knobTransform" />
             </Rectangle.RenderTransform>
+            <Rectangle.Fill>
+                <LinearGradientBrush x:Name="knobGradient" StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop x:Name="knobGS1" Color="Black" Offset="0.0" />
+                    <GradientStop x:Name="knobGS2" Color="White" Offset="0.0"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
         </Rectangle>
     </Grid>
 </UserControl>
