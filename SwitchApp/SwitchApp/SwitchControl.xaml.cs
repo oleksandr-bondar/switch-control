@@ -224,8 +224,8 @@ namespace SwitchApp
         private void knob_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             Point knobPnt = e.GetCurrentPoint(knob).Position;
-            double knobOffsetX = Math.Min(0.75, knobPnt.X / knob.Width);
-            double knobOffsetY = Math.Min(0.75, knobPnt.Y / knob.Height);
+            double knobOffsetX = knobPnt.X / knob.Width;
+            double knobOffsetY = knobPnt.Y / knob.Height;
 
             knobGradient.StartPoint = new Point(knobOffsetX, knobOffsetY);
 
