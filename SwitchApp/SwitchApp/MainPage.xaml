@@ -10,6 +10,6 @@
 
     <Grid Background="LightBlue">
         <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Center"
-                      Width="600"/>
+                      Width="300" Height="200"/>
     </Grid>
 </Page>
