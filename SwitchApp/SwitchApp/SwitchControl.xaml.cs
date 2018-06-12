@@ -45,9 +45,6 @@ namespace SwitchApp
 
         private double _width;
         private double _height;
-
-        //private double _knobWidth;
-        //private double _knobHeight;
         private double _knobSize;
         private double _knobRadius;
         private double _knobPadding;
@@ -57,16 +54,13 @@ namespace SwitchApp
         public SwitchControl()
         {
             this.InitializeComponent();
-            
+            InitLayout();
+
             knob.PointerPressed += Knob_PointerPressed;
+
             knob.PointerReleased += Knob_PointerReleased;
             PointerReleased += Knob_PointerReleased;
             PointerExited += Knob_PointerReleased;
-
-            RegisterPropertyChangedCallback(WidthProperty, tbChangedCallback);
-            RegisterPropertyChangedCallback(HeightProperty, tbChangedCallback);
-            //RegisterPropertyChangedCallback(Rectangle.RadiusXProperty, tbChangedCallback);
-            //RegisterPropertyChangedCallback(Rectangle.RadiusYProperty, tbChangedCallback);
 
             PointerMoved += Grid_PointerMoved;
             //grid.SizeChanged += Grid_PointerMoved;
@@ -78,31 +72,33 @@ namespace SwitchApp
         private void SwitchControl_Loaded(object sender, RoutedEventArgs e)
         {
             storyboardShine.Begin();
+
+            RegisterPropertyChangedCallback(WidthProperty, tbChangedCallback);
+            RegisterPropertyChangedCallback(HeightProperty, tbChangedCallback);
         }
 
         private void Grid_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
             var currPos = e.GetCurrentPoint(grid).Position;
+            var x = currPos.X;
 
             if (knobLastPos.HasValue && knobLastPos.Value.X != currPos.X)
             {
-                double diff = knobLastPos.Value.X - currPos.X;
+                var diff = knobLastPos.Value.X - x;
 
-                double knobX = currPos.X - knob.ActualWidth / 2;
-                double minKnobX = KnobPadding.Left;
-                double maxKnobX = grid.ActualWidth - (KnobPadding.Right + knob.ActualWidth);
-
-                if (knobX < minKnobX)
-                    knobX = minKnobX;
-                else if (knobX > maxKnobX)
-                    knobX = maxKnobX;
-
-                var margin = knob.Margin;
-                margin.Left = knobX;
-                knob.Margin = margin;
-
+                SetKnobPosition(knobTransform.X - diff);
                 knobLastPos = currPos;
             }
+        }
+
+        private void SetKnobPosition(double x)
+        {
+            if (x < _knobMinX)
+                x = _knobMinX;
+            else if (x > _knobMaxX)
+                x = _knobMaxX;
+
+            knobTransform.X = x;
         }
 
         private void Knob_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -119,42 +115,12 @@ namespace SwitchApp
         {
             if (knobLastPos.HasValue)
             {
-                double knobX = knobLastPos.Value.X - knob.ActualWidth / 2;
-                double minKnobX = KnobPadding.Left;
-                double maxKnobX = grid.ActualWidth - (KnobPadding.Right + knob.ActualWidth);
-
-                if (knobX < minKnobX)
-                    knobX = minKnobX;
-                else if (knobX > maxKnobX)
-                    knobX = maxKnobX;
-
-                //knob.Opacity = 1.0;
                 knobLastPos = null;
                 (knob.Fill as SolidColorBrush).Color = knobBackColor;
 
-                double value = 100 * knobX / maxKnobX;
+                double value = 100 * knobTransform.X / _knobMaxX;
 
-                if (value >= 50)
-                {
-                    //double x = (knob.RenderTransform as TranslateTransform).X;
-
-                    //storyboardTrueDA.From = 0;
-                    //storyboardTrueDA.To = (maxKnobX - knobX);
-
-                    //knobX = maxKnobX;
-                }
-                else
-                {
-                    //storyboardTrueDA.From = knobX;
-                    //storyboardTrueDA.To = minKnobX;
-                    //knobX = minKnobX;
-                }
-
-                PointerUpThemeAnimation.Begin();
-                //storyboardTrue.Begin();
-                //var margin = knob.Margin;
-                //margin.Left = knobX;
-                //knob.Margin = margin;
+                SetKnobPosition(value >= 50 ? _knobMaxX : _knobMinX);
             }
         }
 
@@ -177,18 +143,6 @@ namespace SwitchApp
             }
         }
 
-        //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
-        //{
-        //    //storyboardShine.Stop();
-        //    storyboardShine.Begin();
-        //}
-
-        //private void Rectangle_PointerExited(object sender, PointerRoutedEventArgs e)
-        //{
-        //    //storyboardShine.SkipToFill();
-        //    storyboardShine.Stop();
-        //}
-
         private void InitLayout()
         {
             _width = grid.Width;
@@ -203,6 +157,14 @@ namespace SwitchApp
             _knobPadding = (_height - _knobSize) / 2;
             _knobMinX = 0.0;// _knobPadding;
             _knobMaxX = _width - (_knobSize + _knobPadding * 2);
+
+            grid.Height = _height;
+            knob.Width = knob.Height = _knobSize;
+            knob.RadiusX = knob.RadiusY = _knobRadius;
+            knob.Margin = KnobPadding = new Thickness(_knobPadding);
+            shineRect.Width = shineRect.Height = _height;
+            shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
+            shineKeyFrame.Value = _width + _height;
         }
 
         private void tbChangedCallback(DependencyObject sender, DependencyProperty dp)
@@ -224,5 +186,17 @@ namespace SwitchApp
 
             }
         }
+
+        //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
+        //{
+        //    //storyboardShine.Stop();
+        //    storyboardShine.Begin();
+        //}
+
+        //private void Rectangle_PointerExited(object sender, PointerRoutedEventArgs e)
+        //{
+        //    //storyboardShine.SkipToFill();
+        //    storyboardShine.Stop();
+        //}
     }
 }
