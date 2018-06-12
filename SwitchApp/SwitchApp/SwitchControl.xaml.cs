@@ -43,6 +43,17 @@ namespace SwitchApp
         private Point? knobLastPos;
         private Color knobBackColor;
 
+        private double _width;
+        private double _height;
+
+        //private double _knobWidth;
+        //private double _knobHeight;
+        private double _knobSize;
+        private double _knobRadius;
+        private double _knobPadding;
+        private double _knobMinX;
+        private double _knobMaxX;
+
         public SwitchControl()
         {
             this.InitializeComponent();
@@ -124,13 +135,26 @@ namespace SwitchApp
                 double value = 100 * knobX / maxKnobX;
 
                 if (value >= 50)
-                    knobX = maxKnobX;
-                else
-                    knobX = minKnobX;
+                {
+                    //double x = (knob.RenderTransform as TranslateTransform).X;
 
-                var margin = knob.Margin;
-                margin.Left = knobX;
-                knob.Margin = margin;
+                    //storyboardTrueDA.From = 0;
+                    //storyboardTrueDA.To = (maxKnobX - knobX);
+
+                    //knobX = maxKnobX;
+                }
+                else
+                {
+                    //storyboardTrueDA.From = knobX;
+                    //storyboardTrueDA.To = minKnobX;
+                    //knobX = minKnobX;
+                }
+
+                PointerUpThemeAnimation.Begin();
+                //storyboardTrue.Begin();
+                //var margin = knob.Margin;
+                //margin.Left = knobX;
+                //knob.Margin = margin;
             }
         }
 
@@ -153,21 +177,32 @@ namespace SwitchApp
             }
         }
 
-        private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            //storyboardShine.Stop();
-            storyboardShine.Begin();
-        }
+        //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
+        //{
+        //    //storyboardShine.Stop();
+        //    storyboardShine.Begin();
+        //}
 
-        private void Rectangle_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            //storyboardShine.SkipToFill();
-            storyboardShine.Stop();
-        }
+        //private void Rectangle_PointerExited(object sender, PointerRoutedEventArgs e)
+        //{
+        //    //storyboardShine.SkipToFill();
+        //    storyboardShine.Stop();
+        //}
 
         private void InitLayout()
         {
+            _width = grid.Width;
+            //_height = grid.Height;
+            _height = _width / 3;
 
+            if (Math.Abs(grid.Height - _height) >= 1)
+                grid.Height = _height;
+
+            _knobSize = _height / 1.25;
+            _knobRadius = _knobSize / 2;
+            _knobPadding = (_height - _knobSize) / 2;
+            _knobMinX = 0.0;// _knobPadding;
+            _knobMaxX = _width - (_knobSize + _knobPadding * 2);
         }
 
         private void tbChangedCallback(DependencyObject sender, DependencyProperty dp)
