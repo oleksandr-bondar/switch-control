@@ -1,0 +1,65 @@
+﻿<UserControl
+    x:Class="SwitchApp.SwitchControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SwitchApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="50"
+    d:DesignWidth="150">
+
+    <Grid x:Name="grid" CornerRadius="25" Background="DarkOrange" Width="150" Height="50">
+        <Grid.Resources>
+            <Storyboard x:Name="myStoryboard">
+                <DoubleAnimationUsingKeyFrames x:Name="doubleAnimation"
+                   Storyboard.TargetName="MyAnimatedTranslateTransform"
+                   Storyboard.TargetProperty="X"
+                   Duration="0:0:2" EnableDependentAnimation="True" 
+                   RepeatBehavior="Forever" SpeedRatio="1.2">
+                    <EasingDoubleKeyFrame  Value="200" KeyTime="0:0:1.0">
+                        <EasingDoubleKeyFrame.EasingFunction>
+                            <CircleEase EasingMode="EaseIn"/>
+                        </EasingDoubleKeyFrame.EasingFunction>
+                    </EasingDoubleKeyFrame>
+                </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+
+            <Style x:Key="DisabledControl" TargetType="FrameworkElement">
+                <Setter Property="AllowFocusOnInteraction" Value="False" />
+                <Setter Property="IsDoubleTapEnabled" Value="False" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="IsHoldingEnabled" Value="False" />
+                <Setter Property="IsRightTapEnabled" Value="False" />
+                <Setter Property="IsTapEnabled" Value="False" />
+            </Style>
+        </Grid.Resources>
+
+        <Rectangle x:Name="shineRect" Width="50" Height="50"
+                   Margin="-200 0, 0, 0"
+                   Style="{StaticResource DisabledControl}">
+            <Rectangle.RenderTransform>
+                <TranslateTransform x:Name="MyAnimatedTranslateTransform" />
+            </Rectangle.RenderTransform>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                    <GradientStop  Color="#00FFFFFF" Offset="0.0" />
+                    <GradientStop Color="#CCFFFFFF" Offset="0.5" />
+                    <GradientStop Color="#0080BAE8" Offset="0.99" />
+                    <GradientStop  Color="#007DB9E8" Offset="1.0" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <TextBlock Text="Switch" Margin="20 0 20 0" Foreground="White" 
+                   FontFamily="sans-serif" CharacterSpacing="-1" FontWeight="Bold"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" 
+                   TextTrimming="CharacterEllipsis"
+                    Style="{StaticResource DisabledControl}">
+        </TextBlock>
+
+        <Rectangle x:Name="knob" Width="40" Height="40" Margin="5" 
+                       Fill="White" RadiusX="20" RadiusY="20" HorizontalAlignment="Left" >
+        </Rectangle>
+    </Grid>
+</UserControl>
