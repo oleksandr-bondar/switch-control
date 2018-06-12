@@ -12,17 +12,39 @@
     <Grid x:Name="grid" CornerRadius="25" Background="DarkOrange" Width="150" Height="50">
         <Grid.Resources>
             <Storyboard x:Name="storyboardShine">
-                <DoubleAnimationUsingKeyFrames x:Name="doubleAnimation"
-                   Storyboard.TargetName="MyAnimatedTranslateTransform"
+                <DoubleAnimationUsingKeyFrames x:Name="storyboardShineDA"
+                   Storyboard.TargetName="shineTransform"
                    Storyboard.TargetProperty="X"
                    Duration="0:0:2" EnableDependentAnimation="True" 
                    RepeatBehavior="Forever" SpeedRatio="1.2">
-                    <EasingDoubleKeyFrame  Value="200" KeyTime="0:0:1.0">
+                    <EasingDoubleKeyFrame x:Name="shineKeyFrame" Value="200" KeyTime="0:0:1.0">
                         <EasingDoubleKeyFrame.EasingFunction>
                             <CircleEase EasingMode="EaseIn"/>
                         </EasingDoubleKeyFrame.EasingFunction>
                     </EasingDoubleKeyFrame>
                 </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+            
+            <Storyboard x:Name="storyboardTrue">
+                <!--<DrillInThemeAnimation>
+                    
+                </DrillInThemeAnimation>
+                <PointAnimation></PointAnimation>
+                <RepositionThemeAnimation>
+                </RepositionThemeAnimation>-->
+                <DoubleAnimation x:Name="storyboardTrueDA"
+                   Storyboard.TargetName="knobTransform"
+                   Storyboard.TargetProperty="X" 
+                    Duration="0:0:4" SpeedRatio="1.0" >
+                    <!--<DoubleAnimation.EasingFunction>
+                        --><!--<BounceEase Bounces="2" Bounciness="2" EasingMode="EaseIn"/>-->
+                        <!--<ElasticEase Oscillations="3" Springiness="1" EasingMode="EaseIn" />--><!--
+                    </DoubleAnimation.EasingFunction>-->
+                </DoubleAnimation>
+            </Storyboard>
+
+            <Storyboard x:Name="storyboardFalse">
+                
             </Storyboard>
 
             <Style x:Key="DisabledControl" TargetType="FrameworkElement">
@@ -35,11 +57,11 @@
             </Style>
         </Grid.Resources>
 
-        <Rectangle x:Name="shineRect" Width="50" Height="50"
-                   Margin="-200 0, 0, 0"
+        <Rectangle x:Name="shineRect" Width="50" Height="50" HorizontalAlignment="Left"
+                   Margin="-50 0, 0, 0"
                    Style="{StaticResource DisabledControl}">
             <Rectangle.RenderTransform>
-                <TranslateTransform x:Name="MyAnimatedTranslateTransform" />
+                <TranslateTransform x:Name="shineTransform" />
             </Rectangle.RenderTransform>
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
@@ -52,14 +74,17 @@
         </Rectangle>
 
         <TextBlock x:Name="textBlock" Text="Switch" Margin="20 0 20 0" Foreground="White" 
-                   FontFamily="sans-serif" CharacterSpacing="-1" FontWeight="Bold"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" 
-                   TextTrimming="CharacterEllipsis"
-                    Style="{StaticResource DisabledControl}">
+                   FontFamily="sans-serif" FontWeight="Bold" FontSize="20" 
+                   TextTrimming="CharacterEllipsis" CharacterSpacing="-1" 
+                   HorizontalAlignment="Right" VerticalAlignment="Center" 
+                   Style="{StaticResource DisabledControl}">
         </TextBlock>
 
         <Rectangle x:Name="knob" Width="40" Height="40" Margin="5" 
                        Fill="White" RadiusX="20" RadiusY="20" HorizontalAlignment="Left" >
+            <Rectangle.RenderTransform>
+                <TranslateTransform x:Name="knobTransform" />
+            </Rectangle.RenderTransform>
         </Rectangle>
     </Grid>
 </UserControl>
