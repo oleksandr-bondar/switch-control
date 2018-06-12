@@ -42,6 +42,10 @@ namespace SwitchApp
             ValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        private string _text;
+        private bool _checked;
+        private Color _backgroundColor;
+        private Thickness _padding;
         private Point? _knobLastPos;
 
         private double _width;
@@ -104,6 +108,33 @@ namespace SwitchApp
             knobTransform.X = x;
         }
 
+        private void SetKnobPositionAnimation(double value)
+        {
+            //if (x < _knobMinX)
+            //    x = _knobMinX;
+            //else if (x > _knobMaxX)
+            //    x = _knobMaxX;
+
+            storyboardMove.Stop();
+            //storyboardMoveAnim.From = knobTransform.X;
+            //storyboardMoveAnim.To = x;
+            if (value >= 50)
+            {
+                storyboardMoveAnim2.From = knob.Width;
+                storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
+
+                if (storyboardMoveAnim2.From == storyboardMoveAnim2.To)
+                    return;
+            }
+            else
+            {
+                storyboardMoveAnim2.From = knob.Width;
+                storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
+            }
+
+            storyboardMove.Begin();
+        }
+
         private void Knob_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             CaptureKnob(e);
@@ -122,7 +153,8 @@ namespace SwitchApp
 
                 double value = 100 * knobTransform.X / _knobMaxX;
 
-                SetKnobPosition(value >= 50 ? _knobMaxX : _knobMinX);
+                SetKnobPositionAnimation(value);
+                //SetKnobPosition(value >= 50 ? _knobMaxX : _knobMinX);
             }
         }
 
@@ -184,17 +216,18 @@ namespace SwitchApp
 
         private void knob_Loaded(object sender, RoutedEventArgs e)
         {
-            //storyboardTest.Begin();
+            //storyboardTest.Begin();storyboardMove
         }
+
+        #region Filling/Unfilling knob animation
 
         private void knob_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            //var point = e.GetCurrentPoint(grid).Position;
             Point knobPnt = e.GetCurrentPoint(knob).Position;
-            double knobOffsetX = Math.Min(0.75, knobPnt.X / _knobSize);
-            double knobOffsetY = Math.Min(0.75, knobPnt.Y / _knobSize);
+            double knobOffsetX = Math.Min(0.75, knobPnt.X / knob.Width);
+            double knobOffsetY = Math.Min(0.75, knobPnt.Y / knob.Height);
 
-            knobGradient.StartPoint = new Point(knobOffsetX, 0);
+            knobGradient.StartPoint = new Point(knobOffsetX, knobOffsetY);
 
             Color rectColor = (grid.Background as SolidColorBrush).Color;
             Color knobColor = _knobColor;
@@ -229,6 +262,8 @@ namespace SwitchApp
 
             storyboardUnfilling.Begin();
         }
+
+        #endregion
 
         //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
         //{
