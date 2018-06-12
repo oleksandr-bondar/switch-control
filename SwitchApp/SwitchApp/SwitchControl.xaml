@@ -51,7 +51,7 @@
             </Rectangle.Fill>
         </Rectangle>
 
-        <TextBlock Text="Switch" Margin="20 0 20 0" Foreground="White" 
+        <TextBlock x:Name="textBlock" Text="Switch" Margin="20 0 20 0" Foreground="White" 
                    FontFamily="sans-serif" CharacterSpacing="-1" FontWeight="Bold"
                     HorizontalAlignment="Right" VerticalAlignment="Center" 
                    TextTrimming="CharacterEllipsis"

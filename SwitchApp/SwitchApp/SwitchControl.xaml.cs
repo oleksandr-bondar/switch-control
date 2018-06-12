@@ -21,23 +21,41 @@ namespace SwitchApp
 {
     public sealed partial class SwitchControl : UserControl
     {
+        public string Text { get; set; }
+        public Color BackgroundColor { get; set; }
         public Thickness KnobPadding { get; private set; } = new Thickness(5);
+        public double Offset { get; set; }
+        public bool Checked { get; set; }
+
+        public event EventHandler StateChanged;
+        public event EventHandler ValueChanged;
+
+        private void OnStateChanged()
+        {
+            StateChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnValueChanged()
+        {
+            ValueChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         private Point? knobLastPos;
         private Color knobBackColor;
 
         public SwitchControl()
         {
             this.InitializeComponent();
-
+            
             knob.PointerPressed += Knob_PointerPressed;
             knob.PointerReleased += Knob_PointerReleased;
             PointerReleased += Knob_PointerReleased;
             PointerExited += Knob_PointerReleased;
 
-            RegisterPropertyChangedCallback(Rectangle.WidthProperty, tbTagChangedCallback);
-            RegisterPropertyChangedCallback(Rectangle.HeightProperty, tbTagChangedCallback);
-            RegisterPropertyChangedCallback(Rectangle.RadiusXProperty, tbTagChangedCallback);
-            RegisterPropertyChangedCallback(Rectangle.RadiusYProperty, tbTagChangedCallback);
+            RegisterPropertyChangedCallback(WidthProperty, tbChangedCallback);
+            RegisterPropertyChangedCallback(HeightProperty, tbChangedCallback);
+            //RegisterPropertyChangedCallback(Rectangle.RadiusXProperty, tbChangedCallback);
+            //RegisterPropertyChangedCallback(Rectangle.RadiusYProperty, tbChangedCallback);
 
             PointerMoved += Grid_PointerMoved;
             //grid.SizeChanged += Grid_PointerMoved;
@@ -152,7 +170,7 @@ namespace SwitchApp
 
         }
 
-        private void tbTagChangedCallback(DependencyObject sender, DependencyProperty dp)
+        private void tbChangedCallback(DependencyObject sender, DependencyProperty dp)
         {
             if (dp == Rectangle.WidthProperty)
             {
