@@ -27,6 +27,8 @@ namespace SwitchApp
         public double Offset { get; set; }
         public bool Checked { get; set; }
 
+        new public double Width { get => grid.Width; set { grid.Width = value; InitLayout(); } }
+
         public event EventHandler StateChanged;
         public event EventHandler ValueChanged;
 
@@ -45,6 +47,7 @@ namespace SwitchApp
 
         private double _width;
         private double _height;
+        private double _cornerRadius;
         private double _knobSize;
         private double _knobRadius;
         private double _knobPadding;
@@ -146,11 +149,8 @@ namespace SwitchApp
         private void InitLayout()
         {
             _width = grid.Width;
-            //_height = grid.Height;
             _height = _width / 3;
-
-            if (Math.Abs(grid.Height - _height) >= 1)
-                grid.Height = _height;
+            _cornerRadius = _height / 2;
 
             _knobSize = _height / 1.25;
             _knobRadius = _knobSize / 2;
@@ -159,12 +159,16 @@ namespace SwitchApp
             _knobMaxX = _width - (_knobSize + _knobPadding * 2);
 
             grid.Height = _height;
+            grid.CornerRadius = new CornerRadius(_cornerRadius);
+
             knob.Width = knob.Height = _knobSize;
             knob.RadiusX = knob.RadiusY = _knobRadius;
             knob.Margin = KnobPadding = new Thickness(_knobPadding);
+
             shineRect.Width = shineRect.Height = _height;
             shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
             shineKeyFrame.Value = _width + _height;
+            textBlock.FontSize = Math.Max(10, _width / 7.5);
         }
 
         private void tbChangedCallback(DependencyObject sender, DependencyProperty dp)
