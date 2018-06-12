@@ -25,7 +25,7 @@
                 </DoubleAnimationUsingKeyFrames>
             </Storyboard>
 
-            <Storyboard x:Name="storyboardFill">
+            <Storyboard x:Name="storyboardFilling">
                 <DoubleAnimation Storyboard.TargetName="knobGS2"
                                  Storyboard.TargetProperty="Offset" 
                                  EnableDependentAnimation="True" Duration="0:0:0.5" SpeedRatio="1.5"
@@ -34,9 +34,18 @@
                         <CircleEase EasingMode="EaseIn"/>
                     </DoubleAnimation.EasingFunction>
                 </DoubleAnimation>
-                <ColorAnimation x:Name="storyboardFillColorAnim" Storyboard.TargetName="knobGS2" Storyboard.TargetProperty="Color"
+                <ColorAnimation x:Name="storyboardFillingColorAnim" Storyboard.TargetName="knobGS2" Storyboard.TargetProperty="Color"
                                 EnableDependentAnimation="True" Duration="0:0:0.1" BeginTime="0:0:0.4">
                 </ColorAnimation>
+            </Storyboard>
+
+            <Storyboard x:Name="storyboardUnfilling">
+                <ColorAnimation x:Name="storyboardUnfillingAnim" 
+                                Storyboard.TargetName="knobGS1" Storyboard.TargetProperty="Color"
+                                EnableDependentAnimation="True" Duration="0:0:0.5" />
+                <ColorAnimation x:Name="storyboardUnfillingAnim2" 
+                                Storyboard.TargetName="knobGS2" Storyboard.TargetProperty="Color"
+                                EnableDependentAnimation="True" Duration="0:0:0.5" />
             </Storyboard>
             
             <Storyboard x:Name="storyboardTest">

@@ -190,14 +190,14 @@ namespace SwitchApp
         private void knob_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             //var point = e.GetCurrentPoint(grid).Position;
-            var knobPnt = e.GetCurrentPoint(knob).Position;
-            var knobOffsetX = Math.Min(0.75, knobPnt.X / _knobSize);
-            var knobOffsetY = Math.Min(0.75, knobPnt.Y / _knobSize);
+            Point knobPnt = e.GetCurrentPoint(knob).Position;
+            double knobOffsetX = Math.Min(0.75, knobPnt.X / _knobSize);
+            double knobOffsetY = Math.Min(0.75, knobPnt.Y / _knobSize);
 
             knobGradient.StartPoint = new Point(knobOffsetX, 0);
 
-            var rectColor = (grid.Background as SolidColorBrush).Color;
-            var knobColor = _knobColor;
+            Color rectColor = (grid.Background as SolidColorBrush).Color;
+            Color knobColor = _knobColor;
 
             Color newColor = Color.FromArgb(255,
                 (byte)((rectColor.R + knobColor.R) / 2),
@@ -207,17 +207,27 @@ namespace SwitchApp
             knobGS1.Color = newColor;
             knobGS2.Color = _knobColor;
 
-            storyboardFillColorAnim.From = _knobColor;
-            storyboardFillColorAnim.To = newColor;
+            storyboardFillingColorAnim.From = _knobColor;
+            storyboardFillingColorAnim.To = newColor;
 
-            storyboardFill.Begin();
+            storyboardUnfilling.Stop();
+            storyboardFilling.Begin();
         }
 
         private void knob_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            storyboardFill.Stop();
-            knobGS1.Color = knobGS2.Color = _knobColor;
-            knobGS1.Offset = knobGS2.Offset = 0.0;
+            storyboardUnfillingAnim.From = knobGS1.Color;
+            storyboardUnfillingAnim.To = _knobColor;
+
+            storyboardUnfillingAnim2.From = knobGS2.Color;
+            storyboardUnfillingAnim2.To = _knobColor;
+
+            storyboardFilling.Stop();
+
+            knobGS1.Offset = 0.0;
+            knobGS2.Offset = 1.0;
+
+            storyboardUnfilling.Begin();
         }
 
         //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
