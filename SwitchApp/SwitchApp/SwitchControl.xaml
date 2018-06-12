@@ -11,7 +11,7 @@
 
     <Grid x:Name="grid" CornerRadius="25" Background="DarkOrange" Width="150" Height="50">
         <Grid.Resources>
-            <Storyboard x:Name="myStoryboard">
+            <Storyboard x:Name="storyboardShine">
                 <DoubleAnimationUsingKeyFrames x:Name="doubleAnimation"
                    Storyboard.TargetName="MyAnimatedTranslateTransform"
                    Storyboard.TargetProperty="X"

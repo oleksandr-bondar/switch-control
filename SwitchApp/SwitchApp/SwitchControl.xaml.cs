@@ -39,10 +39,16 @@ namespace SwitchApp
             RegisterPropertyChangedCallback(Rectangle.RadiusXProperty, tbTagChangedCallback);
             RegisterPropertyChangedCallback(Rectangle.RadiusYProperty, tbTagChangedCallback);
 
-            grid.PointerMoved += Grid_PointerMoved;
+            PointerMoved += Grid_PointerMoved;
             //grid.SizeChanged += Grid_PointerMoved;
-            grid.PointerEntered += Rectangle_PointerEntered;
-            grid.PointerExited += Rectangle_PointerExited;
+            //grid.PointerEntered += Rectangle_PointerEntered;
+            //grid.PointerExited += Rectangle_PointerExited;
+            Loaded += SwitchControl_Loaded;
+        }
+
+        private void SwitchControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            storyboardShine.Begin();
         }
 
         private void Grid_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -131,14 +137,14 @@ namespace SwitchApp
 
         private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            //myStoryboard.Stop();
-            myStoryboard.Begin();
+            //storyboardShine.Stop();
+            storyboardShine.Begin();
         }
 
         private void Rectangle_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            //myStoryboard.SkipToFill();
-            myStoryboard.Stop();
+            //storyboardShine.SkipToFill();
+            storyboardShine.Stop();
         }
 
         private void InitLayout()
