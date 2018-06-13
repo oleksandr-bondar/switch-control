@@ -110,28 +110,11 @@ namespace SwitchApp
 
         private void SetKnobPositionAnimation(double value)
         {
-            //if (x < _knobMinX)
-            //    x = _knobMinX;
-            //else if (x > _knobMaxX)
-            //    x = _knobMaxX;
-
             storyboardMove.Stop();
-            //storyboardMoveAnim.From = knobTransform.X;
-            //storyboardMoveAnim.To = x;
-            if (value >= 50)
-            {
-                storyboardMoveAnim2.From = knob.Width;
-                storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
-
-                if (storyboardMoveAnim2.From == storyboardMoveAnim2.To)
-                    return;
-            }
-            else
-            {
-                storyboardMoveAnim2.From = knob.Width;
-                storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
-            }
-
+            storyboardMoveAnim.From = knobTransform.X;
+            storyboardMoveAnim.To = (value >= 50 ? _knobMaxX : _knobMinX);
+            //storyboardMoveAnim2.From = knob.Width;
+            //storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
             storyboardMove.Begin();
         }
 
@@ -227,7 +210,39 @@ namespace SwitchApp
             double knobOffsetX = knobPnt.X / knob.Width;
             double knobOffsetY = knobPnt.Y / knob.Height;
 
-            knobGradient.StartPoint = new Point(knobOffsetX, knobOffsetY);
+            Point startPnt = new Point(knobOffsetX, knobOffsetY);
+            knobGradient.StartPoint = startPnt;
+
+            Point leftTop = new Point(0, 0);
+            Point leftRight = new Point(1, 0);
+            Point bottomLeft = new Point(0, 1);
+            Point bottomRight = new Point(1, 1);
+
+            List<Point> pnts = new List<Point>()
+            {
+                leftTop, leftRight,
+                bottomLeft, bottomRight,
+                //new Point(0.5, 0), new Point(0.5, 1),
+                //new Point(0, 0.5), new Point(1, 0.5)
+            };
+
+            Point endPnt;
+            double maxDistance = 0;
+
+            foreach (var pnt in pnts)
+            {
+                double dx = startPnt.X - pnt.X;
+                double dy = startPnt.Y - pnt.Y;
+                double distance = dx * dx + dy * dy;
+
+                if (distance > maxDistance)
+                {
+                    maxDistance = distance;
+                    endPnt = pnt;
+                }
+            }
+
+            knobGradient.EndPoint = endPnt;
 
             Color rectColor = (grid.Background as SolidColorBrush).Color;
             Color knobColor = _knobColor;
@@ -262,7 +277,7 @@ namespace SwitchApp
 
             storyboardUnfilling.Begin();
         }
-
+        
         #endregion
 
         //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)

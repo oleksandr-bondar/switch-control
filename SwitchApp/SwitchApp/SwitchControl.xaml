@@ -49,15 +49,15 @@
             </Storyboard>
             
             <Storyboard x:Name="storyboardMove">
-                <!--<DoubleAnimation x:Name="storyboardMoveAnim"
+                <DoubleAnimation x:Name="storyboardMoveAnim"
                    Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
                    Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
-                </DoubleAnimation>-->
+                </DoubleAnimation>
                 
-                <DoubleAnimation x:Name="storyboardMoveAnim2"
+                <!--<DoubleAnimation x:Name="storyboardMoveAnim2"
                    Storyboard.TargetName="knob" Storyboard.TargetProperty="Width" 
                    Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
-                </DoubleAnimation>
+                </DoubleAnimation>-->
                 <!--<DoubleAnimation 
                    Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
                    From="0" To="40"  Duration="0:0:2" EnableDependentAnimation="True">
