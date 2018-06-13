@@ -22,7 +22,18 @@ namespace SwitchApp
     public sealed partial class SwitchControl : UserControl
     {
         public string Text { get; set; }
-        public Color BackgroundColor { get; set; }
+        public Color BackgroundColor
+        {
+            get => _backgroundColor;
+            set
+            {
+                if (value == _backgroundColor)
+                    return;
+
+                _backgroundColor = value;
+                grid.Background = new SolidColorBrush(_backgroundColor);
+            }
+        }
         public Thickness KnobPadding { get; private set; } = new Thickness(5);
         public double Offset => 100 * knobTransform.X / _knobMaxX;
         public bool Checked { get; set; }
