@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI.Controls;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -10,6 +12,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
@@ -124,6 +127,9 @@ namespace SwitchApp
             storyboardMove.Stop();
             storyboardMoveAnim.From = knobTransform.X;
             storyboardMoveAnim.To = (value >= 50 ? _knobMaxX : _knobMinX);
+
+            //storyboardMoveAnim2.From = knobShadowTransform.X;
+            //storyboardMoveAnim2.To = (value >= 50 ? _knobMaxX : _knobMinX);
             //storyboardMoveAnim2.From = knob.Width;
             //storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
             storyboardMove.Begin();
@@ -210,7 +216,18 @@ namespace SwitchApp
 
         private void knob_Loaded(object sender, RoutedEventArgs e)
         {
-            //storyboardTest.Begin();storyboardMove
+            if (DropShadowPanel.IsSupported)
+            {
+                var hostVisual = ElementCompositionPreview.GetElementVisual(knob);
+                var compositor = hostVisual.Compositor;
+                var spriteVisual = compositor.CreateSpriteVisual();
+
+                // Make sure size of shadow host and shadow visual always stay in sync
+                var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+                bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
+
+                spriteVisual.StartAnimation("Size", bindSizeAnimation);
+            }
         }
 
         #region Filling/Unfilling knob animation
@@ -290,17 +307,5 @@ namespace SwitchApp
         }
         
         #endregion
-
-        //private void Rectangle_PointerEntered(object sender, PointerRoutedEventArgs e)
-        //{
-        //    //storyboardShine.Stop();
-        //    storyboardShine.Begin();
-        //}
-
-        //private void Rectangle_PointerExited(object sender, PointerRoutedEventArgs e)
-        //{
-        //    //storyboardShine.SkipToFill();
-        //    storyboardShine.Stop();
-        //}
     }
 }
