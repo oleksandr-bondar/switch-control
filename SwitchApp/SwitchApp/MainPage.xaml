@@ -9,15 +9,15 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid Background="LightBlue">
-        <Grid Background="LightBlue" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" Height="200">
+        <Grid Background="LightBlue" HorizontalAlignment="Center" VerticalAlignment="Center" Width="450" Height="600">
             <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Top"
-                      Width="150" Height="50" />
+                      Width="450" />
 
             <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Center"
-                      Width="150" Height="50" BackgroundColor="Red"/>
+                      Width="150" BackgroundColor="Red"/>
 
             <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                      Width="150" Height="50" BackgroundColor="Blue"/>
+                      Width="300" BackgroundColor="Blue"/>
         </Grid>
     </Grid>
 </Page>
