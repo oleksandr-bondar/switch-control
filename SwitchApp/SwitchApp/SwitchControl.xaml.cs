@@ -42,6 +42,7 @@ namespace SwitchApp
         public bool Checked { get; set; }
 
         new public double Width { get => grid.Width; set { grid.Width = value; InitLayout(); } }
+        new public double Height { get => _height; }
 
         public event EventHandler StateChanged;
         public event EventHandler ValueChanged;
@@ -192,6 +193,14 @@ namespace SwitchApp
             shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
             shineKeyFrame.Value = _width + _height;
             textBlock.FontSize = Math.Max(10, _width / 7.5);
+
+            if (DropShadowPanel.IsSupported)
+            {
+                double shadowOffset = Math.Max(1.0, _knobSize / 5.0);
+                knobShadow.OffsetX = shadowOffset;
+                knobShadow.OffsetY = shadowOffset;
+                knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
+            }
         }
 
         private void tbChangedCallback(DependencyObject sender, DependencyProperty dp)
