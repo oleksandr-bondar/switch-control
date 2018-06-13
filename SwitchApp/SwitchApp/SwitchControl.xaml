@@ -64,12 +64,14 @@
                 </DoubleAnimation>-->
             </Storyboard>
 
-            <Storyboard x:Name="storyboardCircle">
-                <DoubleAnimation 
-                    Storyboard.TargetName="knob"
-                    Storyboard.TargetProperty="Width"
-                    From="40" To="140"
-                    Duration="0:0:1" SpeedRatio="1.0" AutoReverse="False" EnableDependentAnimation="True">
+            <Storyboard x:Name="storyboardConstriction">
+                <DoubleAnimation x:Name="storyboardConstrictionAnimX"
+                   Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
+                   Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
+                </DoubleAnimation>
+                <DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
+                    Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
+                    Duration="0:0:1" EnableDependentAnimation="True">
                 </DoubleAnimation>
             </Storyboard>
             
