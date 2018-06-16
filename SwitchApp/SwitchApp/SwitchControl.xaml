@@ -59,14 +59,39 @@
             <Storyboard x:Name="storyboardConstriction">
                 <DoubleAnimation x:Name="storyboardConstrictionAnimX"
                    Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
+                   Duration="0:0:0.25" EnableDependentAnimation="True">
+                    <!--<DoubleAnimation.EasingFunction>
+                        <CircleEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>-->
                 </DoubleAnimation>
-                <DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
+                
+                <!--<DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
                     Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
-                    Duration="0:0:1" EnableDependentAnimation="True">
-                </DoubleAnimation>
+                    Duration="0:0:0.3" EnableDependentAnimation="True">
+                    --><!--<DoubleAnimation.EasingFunction>
+                        <CircleEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>--><!--
+                </DoubleAnimation>-->
             </Storyboard>
             
+            <Storyboard x:Name="storyboardConstriction2">
+                <!--<DoubleAnimation x:Name="storyboardConstrictionAnimX"
+                   Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
+                   Duration="0:0:0.3" EnableDependentAnimation="True">
+                    --><!--<DoubleAnimation.EasingFunction>
+                        <CircleEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>--><!--
+                </DoubleAnimation>-->
+
+                <DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
+                    Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
+                    Duration="0:0:0.25" EnableDependentAnimation="True">
+                    <!--<DoubleAnimation.EasingFunction>
+                        <CircleEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>-->
+                </DoubleAnimation>
+            </Storyboard>
+
             <Style x:Key="DisabledControl" TargetType="FrameworkElement">
                 <Setter Property="AllowFocusOnInteraction" Value="False" />
                 <Setter Property="IsDoubleTapEnabled" Value="False" />
@@ -107,11 +132,7 @@
             </controls:DropShadowPanel.RenderTransform>
             <Rectangle x:Name="knob" Width="40" Height="40" Margin="5" Loaded="knob_Loaded" 
                        PointerEntered="knob_PointerEntered" PointerExited="knob_PointerExited"
-                        RadiusX="20" RadiusY="20" HorizontalAlignment="Left" 
-                       Stretch="Fill">
-                <!--<Rectangle.RenderTransform>
-                    <TranslateTransform x:Name="knobTransform" />
-                </Rectangle.RenderTransform>-->
+                        RadiusX="20" RadiusY="20" HorizontalAlignment="Left">
                 <Rectangle.Fill>
                     <LinearGradientBrush x:Name="knobGradient" StartPoint="0,0" EndPoint="1,1">
                         <GradientStop x:Name="knobGS1" Color="Black" Offset="0.0" />
