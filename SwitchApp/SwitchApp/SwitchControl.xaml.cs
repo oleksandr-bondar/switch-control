@@ -131,24 +131,20 @@ namespace SwitchApp
                 else if (newWidth < _knobMinWidth)
                     newWidth = _knobMinWidth;
 
+                if (knob.Width == newWidth)
+                    return;
+
                 knob.Width = newWidth;
 
                 storyboardConstriction.Pause();
-                storyboardConstriction2.Pause();
 
                 storyboardConstrictionAnimX.From = knobTransform.X;
                 storyboardConstrictionAnimX.To = knobTransform.X + (knob.Width - _knobMinWidth);
 
-                storyboardConstrictionAnim2Width.From = knob.Width;
-                storyboardConstrictionAnim2Width.To = _knobMinWidth;
+                storyboardConstrictionAnimWidth.From = knob.Width;
+                storyboardConstrictionAnimWidth.To = _knobMinWidth;
 
-                //if (Math.Abs(storyboardConstrictionAnimX.From.Value
-                //    - storyboardConstrictionAnimX.To.Value) >= 1)
                 storyboardConstriction.Begin();
-
-                //if (Math.Abs(storyboardConstrictionAnim2Width.From.Value
-                //    - storyboardConstrictionAnim2Width.To.Value) >= 1)
-                storyboardConstriction2.Begin();
             }
             else
             {
@@ -162,22 +158,10 @@ namespace SwitchApp
                 knobTransform.X = newX;
                 knob.Width = newWidth;
 
-                //storyboardConstriction.Pause();
-                storyboardConstriction2.Pause();
-
-                //storyboardConstrictionAnimX.From = oldX;
-                //storyboardConstrictionAnimX.To = newX;
-
-                storyboardConstrictionAnim2Width.From = knob.Width;
-                storyboardConstrictionAnim2Width.To = _knobMinWidth;
-
-                //if (Math.Abs(storyboardConstrictionAnimX.From.Value 
-                //    - storyboardConstrictionAnimX.To.Value) >= 1)
-                //    storyboardConstriction.Begin();
-
-                //if (Math.Abs(storyboardConstrictionAnim2Width.From.Value 
-                //    - storyboardConstrictionAnim2Width.To.Value) >= 1)
-                storyboardConstriction2.Begin();
+                storyboardWidth.Pause();
+                storyboardWidthAnim.From = knob.Width;
+                storyboardWidthAnim.To = _knobMinWidth;
+                storyboardWidth.Begin();
             }
 
             double value = 100 * knobTransform.X / _knobMaxX;

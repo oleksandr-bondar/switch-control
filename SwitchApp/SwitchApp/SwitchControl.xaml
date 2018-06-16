@@ -55,43 +55,26 @@
                    Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
                 </DoubleAnimation>
             </Storyboard>
+            
+            <Storyboard x:Name="storyboardWidth">
+                <DoubleAnimation x:Name="storyboardWidthAnim"
+                   Storyboard.TargetName="knob" Storyboard.TargetProperty="Width" 
+                   Duration="0:0:0.2" EnableDependentAnimation="True">
+                </DoubleAnimation>
+            </Storyboard>
 
             <Storyboard x:Name="storyboardConstriction">
                 <DoubleAnimation x:Name="storyboardConstrictionAnimX"
                    Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.25" EnableDependentAnimation="True">
-                    <!--<DoubleAnimation.EasingFunction>
-                        <CircleEase EasingMode="EaseIn"/>
-                    </DoubleAnimation.EasingFunction>-->
+                   Duration="0:0:0.2" EnableDependentAnimation="True">
                 </DoubleAnimation>
                 
-                <!--<DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
+                <DoubleAnimation x:Name="storyboardConstrictionAnimWidth"
                     Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
-                    Duration="0:0:0.3" EnableDependentAnimation="True">
-                    --><!--<DoubleAnimation.EasingFunction>
-                        <CircleEase EasingMode="EaseIn"/>
-                    </DoubleAnimation.EasingFunction>--><!--
-                </DoubleAnimation>-->
-            </Storyboard>
-            
-            <Storyboard x:Name="storyboardConstriction2">
-                <!--<DoubleAnimation x:Name="storyboardConstrictionAnimX"
-                   Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.3" EnableDependentAnimation="True">
-                    --><!--<DoubleAnimation.EasingFunction>
-                        <CircleEase EasingMode="EaseIn"/>
-                    </DoubleAnimation.EasingFunction>--><!--
-                </DoubleAnimation>-->
-
-                <DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
-                    Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
-                    Duration="0:0:0.25" EnableDependentAnimation="True">
-                    <!--<DoubleAnimation.EasingFunction>
-                        <CircleEase EasingMode="EaseIn"/>
-                    </DoubleAnimation.EasingFunction>-->
+                    Duration="0:0:0.2" EnableDependentAnimation="True">
                 </DoubleAnimation>
             </Storyboard>
-
+            
             <Style x:Key="DisabledControl" TargetType="FrameworkElement">
                 <Setter Property="AllowFocusOnInteraction" Value="False" />
                 <Setter Property="IsDoubleTapEnabled" Value="False" />
