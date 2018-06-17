@@ -24,7 +24,7 @@ namespace SwitchApp
 {
     public sealed partial class SwitchControl : UserControl
     {
-        public string Text { get; set; }
+        public string Text { get => textBlock.Text; set => textBlock.Text = value; }
         public Color BackgroundColor
         {
             get => _backgroundColor;
@@ -37,14 +37,35 @@ namespace SwitchApp
                 grid.Background = new SolidColorBrush(_backgroundColor);
             }
         }
-        public Thickness KnobPadding { get; private set; } = new Thickness(5);
+        //public Thickness KnobPadding { get; private set; } = new Thickness(5);
+        public double KnobPadding
+        {
+            get => _knobPadding;
+            set
+            {
+
+            }
+        }
         public double Offset => 100 * knobTransform.X / _knobMaxX;
-        public bool Checked { get; set; }
+        public bool Checked
+        {
+            get => _checked;
+            set
+            {
+
+            }
+        }
 
         new public double Width { get => grid.Width; set { grid.Width = value; InitLayout(); } }
         new public double Height { get => _height; }
 
+        /// <summary>
+        /// Occurs, when control state changed (checked: true or false).
+        /// </summary>
         public event EventHandler StateChanged;
+        /// <summary>
+        /// Occurs, when knob position in control changed (Offset value from 0 to 100).
+        /// </summary>
         public event EventHandler ValueChanged;
 
         private void OnStateChanged()
@@ -136,7 +157,8 @@ namespace SwitchApp
 
                 knob.Width = newWidth;
 
-                storyboardConstriction.Pause();
+                storyboardWidth.Stop();
+                //storyboardConstriction.Pause();
 
                 storyboardConstrictionAnimX.From = knobTransform.X;
                 storyboardConstrictionAnimX.To = knobTransform.X + (knob.Width - _knobMinWidth);
@@ -158,7 +180,8 @@ namespace SwitchApp
                 knobTransform.X = newX;
                 knob.Width = newWidth;
 
-                storyboardWidth.Pause();
+                storyboardConstriction.Stop();
+                //storyboardWidth.Pause();
                 storyboardWidthAnim.From = knob.Width;
                 storyboardWidthAnim.To = _knobMinWidth;
                 storyboardWidth.Begin();
@@ -239,7 +262,8 @@ namespace SwitchApp
 
             knob.Width = knob.Height = _knobSize;
             knob.RadiusX = knob.RadiusY = _knobRadius;
-            knob.Margin = KnobPadding = new Thickness(_knobPadding);
+            knob.Margin = new Thickness(_knobPadding);
+            KnobPadding = _knobPadding;//new Thickness(_knobPadding);
 
             shineRect.Width = shineRect.Height = _height;
             shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
