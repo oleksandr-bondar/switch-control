@@ -59,19 +59,19 @@
             <Storyboard x:Name="storyboardWidth">
                 <DoubleAnimation x:Name="storyboardWidthAnim"
                    Storyboard.TargetName="knob" Storyboard.TargetProperty="Width" 
-                   Duration="0:0:0.2" EnableDependentAnimation="True">
+                   Duration="0:0:0.1" EnableDependentAnimation="True">
                 </DoubleAnimation>
             </Storyboard>
 
             <Storyboard x:Name="storyboardConstriction">
                 <DoubleAnimation x:Name="storyboardConstrictionAnimX"
                    Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.2" EnableDependentAnimation="True">
+                   Duration="0:0:0.1" EnableDependentAnimation="True">
                 </DoubleAnimation>
                 
                 <DoubleAnimation x:Name="storyboardConstrictionAnimWidth"
                     Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
-                    Duration="0:0:0.2" EnableDependentAnimation="True">
+                    Duration="0:0:0.1" EnableDependentAnimation="True">
                 </DoubleAnimation>
             </Storyboard>
             
