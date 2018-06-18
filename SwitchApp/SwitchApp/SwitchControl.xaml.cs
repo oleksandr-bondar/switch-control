@@ -94,7 +94,9 @@ namespace SwitchApp
         private double _knobMaxX;
         private Color _knobColor;
 
-        //private double _knobInitPosition = 0;
+        private static readonly TimeSpan AnimDurationMoveKnob = TimeSpan.FromSeconds(0.1);
+        private static readonly TimeSpan AnimDurationFreeKnob = TimeSpan.FromSeconds(0.5);
+
         private double _knobMinWidth;
         private double _knobMaxWidth;
         private double CurrKnobMaxWidth => _knobMaxWidth - knobTransform.X;
@@ -136,15 +138,27 @@ namespace SwitchApp
             }
         }
 
+        private bool _animLeft;
+        private bool _animRight;
+
         private void SetKnobPosition(double x)
         {
             double diff = (_knobLastPos.Value.X - x);
+            Debug.WriteLine($"x: {x} | diff: {diff}");
 
-            if (diff == 0)
+            if (Math.Abs(diff) < 1)
                 return;
 
             if (diff < 0)
             {
+                if (_animLeft)
+                {
+                    knob.Width = storyboardWidthAnim.To.Value;
+                    storyboardWidth.Stop();
+                    _animLeft = false;
+                    //return;
+                }
+
                 double newWidth = knob.Width + Math.Abs(diff);
 
                 if (newWidth > CurrKnobMaxWidth)
@@ -157,9 +171,6 @@ namespace SwitchApp
 
                 knob.Width = newWidth;
 
-                storyboardWidth.Stop();
-                //storyboardConstriction.Pause();
-
                 storyboardConstrictionAnimX.From = knobTransform.X;
                 storyboardConstrictionAnimX.To = knobTransform.X + (knob.Width - _knobMinWidth);
 
@@ -167,29 +178,43 @@ namespace SwitchApp
                 storyboardConstrictionAnimWidth.To = _knobMinWidth;
 
                 storyboardConstriction.Begin();
+                _animRight = true;
             }
-            else
+            else// if (diff > 0)
             {
+                if (_animRight)
+                {
+                    knob.Width = storyboardConstrictionAnimWidth.To.Value;
+                    knobTransform.X = storyboardConstrictionAnimX.To.Value;
+                    storyboardConstriction.Stop();
+                    _animRight = false;
+                    //return;
+                }
+
                 double newWidth = knob.Width + Math.Abs(diff);
                 double newX = knobTransform.X - diff;
                 double oldX = knobTransform.X;
 
-                if (newX < _knobMinX || newX > _knobMaxX)
-                    return;
+                if (newX < _knobMinX)// || newX > _knobMaxX)
+                {
+                    if (knobTransform.X == _knobMinX)
+                        return;
+
+                    newX = _knobMinX;
+                }
 
                 knobTransform.X = newX;
                 knob.Width = newWidth;
 
-                storyboardConstriction.Stop();
-                //storyboardWidth.Pause();
                 storyboardWidthAnim.From = knob.Width;
                 storyboardWidthAnim.To = _knobMinWidth;
                 storyboardWidth.Begin();
+                _animLeft = true;
             }
 
-            double value = 100 * knobTransform.X / _knobMaxX;
-
-            Debug.WriteLine("Value: " + value.ToString());
+            OnValueChanged();
+            //double value = 100 * knobTransform.X / _knobMaxX;
+            //Debug.WriteLine("Value: " + value.ToString());
         }
 
         private void SetKnobPositionAnimation(double value)
@@ -220,8 +245,16 @@ namespace SwitchApp
             if (_knobLastPos.HasValue)
             {
                 //knob_PointerExited(null, null);
-                _knobLastPos = null;
 
+                //storyboardConstriction.Duration = AnimDurationFreeKnob;
+                //storyboardWidth.Duration = AnimDurationFreeKnob;
+
+                if (Offset >= 50)
+                    SetKnobPosition(_width);
+                else
+                    SetKnobPosition(0);
+
+                _knobLastPos = null;
                 //double value = 100 * knobTransform.X / _knobMaxX;
 
                 //SetKnobPositionAnimation(value);
@@ -234,6 +267,9 @@ namespace SwitchApp
         {
             if (!_knobLastPos.HasValue)
             {
+                //storyboardConstriction.Duration = AnimDurationMoveKnob;
+                //storyboardWidth.Duration = AnimDurationMoveKnob;
+
                 var point = e.GetCurrentPoint(grid).Position;
 
                 _knobLastPos = point;
