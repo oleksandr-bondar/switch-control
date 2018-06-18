@@ -400,6 +400,7 @@ namespace SwitchApp
                 _knobLastPosX = null;
             }
         }
+
         private void CaptureKnob(PointerRoutedEventArgs e)
         {
             if (!_knobLastPosX.HasValue)
@@ -437,17 +438,29 @@ namespace SwitchApp
             {
                 leftTop, leftRight,
                 bottomLeft, bottomRight,
-                //new Point(0.5, 0), new Point(0.5, 1),
-                //new Point(0, 0.5), new Point(1, 0.5)
+                // 4 sides of circumcircle
+                new Point(0.5, -0.2), new Point(1.2, 0.5),
+                new Point(0.5, 1.2), new Point(-0.2, 0.5)
             };
+
+            //const double radius = 2.0;
+            //const double step = Math.PI * 2.0 / 180;
+
+            //for (double radians = 0; radians < Math.PI * 2.0; radians += step)
+            //{
+            //    double x = radius * Math.Cos(radians);
+            //    double y = radius * Math.Sin(radians);
+
+            //    pnts.Add(new Point(x, y));
+            //}
 
             Point endPnt;
             double maxDistance = 0;
 
             foreach (var pnt in pnts)
             {
-                double dx = startPnt.X - pnt.X;
-                double dy = startPnt.Y - pnt.Y;
+                double dx = pnt.X - startPnt.X;
+                double dy = pnt.Y - startPnt.Y;
                 double distance = dx * dx + dy * dy;
 
                 if (distance > maxDistance)
