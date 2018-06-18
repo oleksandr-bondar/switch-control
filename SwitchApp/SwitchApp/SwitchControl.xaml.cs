@@ -24,7 +24,7 @@ namespace SwitchApp
 {
     public sealed partial class SwitchControl : UserControl
     {
-        #region Properties
+        #region Public Properties
 
         public string Text { get => textBlock.Text; set => textBlock.Text = value; }
 
@@ -68,7 +68,8 @@ namespace SwitchApp
 
                 if (DropShadowPanel.IsSupported)
                 {
-                    double shadowOffset = Math.Max(1.0, _knobSize / 5.0) + _knobPadding;
+                    double shadowOffset = 3 + _knobPadding;
+
                     knobShadow.OffsetX = shadowOffset;
                     knobShadow.OffsetY = shadowOffset;
                     knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
@@ -132,7 +133,7 @@ namespace SwitchApp
 
         #endregion
 
-        #region Events
+        #region Public Events
 
         /// <summary>
         /// Occurs, when control state changed (checked: true or false).
@@ -155,12 +156,12 @@ namespace SwitchApp
 
         #endregion
 
-        #region Fields
+        #region Private Fields
 
         //private string _text;
+        //private Thickness _padding;
         private bool _checked;
         private Color _backgroundColor;
-        //private Thickness _padding;
         private Point? _knobLastPos;
 
         private double _width;
@@ -178,10 +179,6 @@ namespace SwitchApp
 
         private bool _animLeft;
         private bool _animRight;
-
-
-        private static readonly TimeSpan AnimDurationMoveKnob = TimeSpan.FromSeconds(0.1);
-        private static readonly TimeSpan AnimDurationFreeKnob = TimeSpan.FromSeconds(0.5);
 
         private double CurrKnobMaxWidth => _knobMaxWidth - knobTransform.X;
 
@@ -256,7 +253,8 @@ namespace SwitchApp
 
             if (DropShadowPanel.IsSupported)
             {
-                double shadowOffset = Math.Max(1.0, _knobSize / 5.0);
+                double shadowOffset = 3 + _knobPadding;
+
                 knobShadow.OffsetX = shadowOffset;
                 knobShadow.OffsetY = shadowOffset;
                 knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
@@ -269,7 +267,21 @@ namespace SwitchApp
 
         #region Initialization
 
+        private void knob_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DropShadowPanel.IsSupported)
+            {
+                var hostVisual = ElementCompositionPreview.GetElementVisual(knob);
+                var compositor = hostVisual.Compositor;
+                var spriteVisual = compositor.CreateSpriteVisual();
 
+                // Make sure size of shadow host and shadow visual always stay in sync
+                var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+                bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
+
+                spriteVisual.StartAnimation("Size", bindSizeAnimation);
+            }
+        }
 
         #endregion
 
@@ -361,11 +373,11 @@ namespace SwitchApp
             //Debug.WriteLine("Value: " + value.ToString());
         }
 
-        private void SetKnobPositionAnimation(double value)
+        private void SetKnobPositionAnimation()
         {
             storyboardMove.Stop();
             storyboardMoveAnim.From = knobTransform.X;
-            storyboardMoveAnim.To = (value >= 50 ? _knobMaxX : _knobMinX);
+            storyboardMoveAnim.To = (KnobOffset >= 50 ? _knobMaxX : _knobMinX);
 
             //storyboardMoveAnim2.From = knobShadowTransform.X;
             //storyboardMoveAnim2.To = (value >= 50 ? _knobMaxX : _knobMinX);
@@ -388,6 +400,7 @@ namespace SwitchApp
         {
             if (_knobLastPos.HasValue)
             {
+                _knobLastPos = null;
                 //knob_PointerExited(null, null);
 
                 //storyboardConstriction.Duration = AnimDurationFreeKnob;
@@ -398,10 +411,9 @@ namespace SwitchApp
                 //else
                 //    SetKnobPosition(0);
 
-                _knobLastPos = null;
                 //double value = 100 * knobTransform.X / _knobMaxX;
 
-                //SetKnobPositionAnimation(value);
+                //SetKnobPositionAnimation();
                 //UnfillingKnob();
                 //SetKnobPosition(value >= 50 ? _knobMaxX : _knobMinX);
             }
@@ -411,29 +423,13 @@ namespace SwitchApp
         {
             if (!_knobLastPos.HasValue)
             {
+                _knobLastPos = e.GetCurrentPoint(grid).Position;
                 //storyboardConstriction.Duration = AnimDurationMoveKnob;
                 //storyboardWidth.Duration = AnimDurationMoveKnob;
 
-                var point = e.GetCurrentPoint(grid).Position;
+                //var point = e.GetCurrentPoint(grid).Position;
 
-                _knobLastPos = point;
                 //FillingKnob(e);
-            }
-        }
-
-        private void knob_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (DropShadowPanel.IsSupported)
-            {
-                var hostVisual = ElementCompositionPreview.GetElementVisual(knob);
-                var compositor = hostVisual.Compositor;
-                var spriteVisual = compositor.CreateSpriteVisual();
-
-                // Make sure size of shadow host and shadow visual always stay in sync
-                var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
-                bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
-
-                spriteVisual.StartAnimation("Size", bindSizeAnimation);
             }
         }
 
