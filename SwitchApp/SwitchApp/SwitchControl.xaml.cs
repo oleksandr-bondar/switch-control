@@ -142,16 +142,16 @@ namespace SwitchApp
         /// <summary>
         /// Occurs, when knob position in control changed (Offset value from 0.0 to 100.0).
         /// </summary>
-        public event EventHandler ValueChanged;
+        public event EventHandler<double> ValueChanged;
 
         private void OnStateChanged()
         {
             StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnValueChanged()
+        private void OnValueChanged(double value)
         {
-            ValueChanged?.Invoke(this, EventArgs.Empty);
+            ValueChanged?.Invoke(this, value);
         }
 
         #endregion
@@ -162,7 +162,7 @@ namespace SwitchApp
         //private Thickness _padding;
         private bool _checked;
         private Color _backgroundColor;
-        private Point? _knobLastPos;
+        private double? _knobLastPosX;
 
         private double _width;
         private double _height;
@@ -195,10 +195,6 @@ namespace SwitchApp
         }
 
 
-
-        #endregion
-
-        #region Event Handlers
 
         #endregion
 
@@ -285,21 +281,19 @@ namespace SwitchApp
 
         #endregion
 
+        #region Event Handlers
+
+        #endregion
+
         private void Grid_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            var currPos = e.GetCurrentPoint(grid).Position;
-            var x = currPos.X;
-
-            if (_knobLastPos.HasValue && Math.Abs(_knobLastPos.Value.X - currPos.X) >= 1)
-            {
-                SetKnobPosition(x);
-                _knobLastPos = currPos;
-            }
+            if (_knobLastPosX.HasValue)
+                SetKnobPosition(e.GetCurrentPoint(grid).Position.X);
         }
 
         private void SetKnobPosition(double x)
         {
-            double diff = (_knobLastPos.Value.X - x);
+            double diff = (_knobLastPosX.Value - x);
             Debug.WriteLine($"x: {x} | diff: {diff}");
 
             if (Math.Abs(diff) < 1)
@@ -309,10 +303,11 @@ namespace SwitchApp
             {
                 if (_animLeft)
                 {
-                    knob.Width = storyboardWidthAnim.To.Value;
                     storyboardWidth.Stop();
+
+                    knob.Width = storyboardWidthAnim.To.Value;
+
                     _animLeft = false;
-                    //return;
                 }
 
                 double newWidth = knob.Width + Math.Abs(diff);
@@ -327,11 +322,13 @@ namespace SwitchApp
 
                 knob.Width = newWidth;
 
+                storyboardConstrictionAnimWidth.From = knob.Width;
+
+                if (!storyboardConstrictionAnimWidth.To.HasValue)
+                    storyboardConstrictionAnimWidth.To = _knobMinWidth;
+
                 storyboardConstrictionAnimX.From = knobTransform.X;
                 storyboardConstrictionAnimX.To = knobTransform.X + (knob.Width - _knobMinWidth);
-
-                storyboardConstrictionAnimWidth.From = knob.Width;
-                storyboardConstrictionAnimWidth.To = _knobMinWidth;
 
                 storyboardConstriction.Begin();
                 _animRight = true;
@@ -340,18 +337,19 @@ namespace SwitchApp
             {
                 if (_animRight)
                 {
+                    storyboardConstriction.Stop();
+
                     knob.Width = storyboardConstrictionAnimWidth.To.Value;
                     knobTransform.X = storyboardConstrictionAnimX.To.Value;
-                    storyboardConstriction.Stop();
+
                     _animRight = false;
-                    //return;
                 }
 
                 double newWidth = knob.Width + Math.Abs(diff);
                 double newX = knobTransform.X - diff;
                 double oldX = knobTransform.X;
 
-                if (newX < _knobMinX)// || newX > _knobMaxX)
+                if (newX < _knobMinX)
                 {
                     if (knobTransform.X == _knobMinX)
                         return;
@@ -363,26 +361,25 @@ namespace SwitchApp
                 knob.Width = newWidth;
 
                 storyboardWidthAnim.From = knob.Width;
-                storyboardWidthAnim.To = _knobMinWidth;
+
+                if (!storyboardWidthAnim.To.HasValue)
+                    storyboardWidthAnim.To = _knobMinWidth;
+
                 storyboardWidth.Begin();
                 _animLeft = true;
             }
 
-            OnValueChanged();
-            //double value = 100 * knobTransform.X / _knobMaxX;
-            //Debug.WriteLine("Value: " + value.ToString());
+            _knobLastPosX = x;
+            OnValueChanged(KnobOffset);
         }
 
         private void SetKnobPositionAnimation()
         {
             storyboardMove.Stop();
+
             storyboardMoveAnim.From = knobTransform.X;
             storyboardMoveAnim.To = (KnobOffset >= 50 ? _knobMaxX : _knobMinX);
 
-            //storyboardMoveAnim2.From = knobShadowTransform.X;
-            //storyboardMoveAnim2.To = (value >= 50 ? _knobMaxX : _knobMinX);
-            //storyboardMoveAnim2.From = knob.Width;
-            //storyboardMoveAnim2.To = knob.Width + (_width - (knob.Width + _knobPadding * 2 + knobTransform.X));
             storyboardMove.Begin();
         }
 
@@ -398,38 +395,16 @@ namespace SwitchApp
 
         private void FreeKnob()
         {
-            if (_knobLastPos.HasValue)
+            if (_knobLastPosX.HasValue)
             {
-                _knobLastPos = null;
-                //knob_PointerExited(null, null);
-
-                //storyboardConstriction.Duration = AnimDurationFreeKnob;
-                //storyboardWidth.Duration = AnimDurationFreeKnob;
-
-                //if (Offset >= 50)
-                //    SetKnobPosition(_width);
-                //else
-                //    SetKnobPosition(0);
-
-                //double value = 100 * knobTransform.X / _knobMaxX;
-
-                //SetKnobPositionAnimation();
-                //UnfillingKnob();
-                //SetKnobPosition(value >= 50 ? _knobMaxX : _knobMinX);
+                _knobLastPosX = null;
             }
         }
-
         private void CaptureKnob(PointerRoutedEventArgs e)
         {
-            if (!_knobLastPos.HasValue)
+            if (!_knobLastPosX.HasValue)
             {
-                _knobLastPos = e.GetCurrentPoint(grid).Position;
-                //storyboardConstriction.Duration = AnimDurationMoveKnob;
-                //storyboardWidth.Duration = AnimDurationMoveKnob;
-
-                //var point = e.GetCurrentPoint(grid).Position;
-
-                //FillingKnob(e);
+                _knobLastPosX = e.GetCurrentPoint(grid).Position.X;
             }
         }
 
