@@ -24,7 +24,10 @@ namespace SwitchApp
 {
     public sealed partial class SwitchControl : UserControl
     {
+        #region Properties
+
         public string Text { get => textBlock.Text; set => textBlock.Text = value; }
+
         public Color BackgroundColor
         {
             get => _backgroundColor;
@@ -37,34 +40,106 @@ namespace SwitchApp
                 grid.Background = new SolidColorBrush(_backgroundColor);
             }
         }
-        //public Thickness KnobPadding { get; private set; } = new Thickness(5);
+
         public double KnobPadding
         {
             get => _knobPadding;
             set
             {
+                if (_knobPadding == value)
+                    return;
 
+                if (value < 1)
+                    throw new ArgumentOutOfRangeException(nameof(KnobPadding), value, "KnobPadding value must be greater than 1.");
+                else if (value > _height / 3)
+                    throw new ArgumentOutOfRangeException(nameof(KnobPadding), value, "KnobPadding value must be less than a one third of height of the SwitchControl.");
+
+                _knobPadding = value;
+                _knobSize = _height - _knobPadding * 2;
+
+                _knobRadius = _knobSize / 2;
+                _knobMaxX = _width - (_knobSize + _knobPadding * 2);
+                _knobMinWidth = _knobSize;
+                _knobMaxWidth = _width - (_knobPadding * 2);
+
+                knob.Margin = new Thickness(_knobPadding);
+                knob.Width = knob.Height = _knobSize;
+                knob.RadiusX = knob.RadiusY = _knobRadius;
+
+                if (DropShadowPanel.IsSupported)
+                {
+                    double shadowOffset = Math.Max(1.0, _knobSize / 5.0) + _knobPadding;
+                    knobShadow.OffsetX = shadowOffset;
+                    knobShadow.OffsetY = shadowOffset;
+                    knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
+                }
+
+                SetKnobPositionByChecked();
             }
         }
-        public double Offset => 100 * knobTransform.X / _knobMaxX;
+
+        /// <summary>
+        /// Get or set a control state (true or false).
+        /// </summary>
         public bool Checked
         {
             get => _checked;
             set
             {
+                if (_checked == value)
+                    return;
 
+                _checked = value;
+                SetKnobPositionByChecked();
             }
         }
 
-        new public double Width { get => grid.Width; set { grid.Width = value; InitLayout(); } }
+        /// <summary>
+        /// Get a knob position in control (value from 0.0 to 100.0).
+        /// </summary>
+        public double KnobOffset => 100 * knobTransform.X / _knobMaxX;
+
+        public Color KnobColor
+        {
+            get => _knobColor;
+            set
+            {
+                if (_knobColor == value)
+                    return;
+
+                _knobColor = value;
+                knobGS2.Color = value;
+            }
+        }
+
+        new public double Width
+        {
+            get => grid.Width;
+            set
+            {
+                if (grid.Width == value)
+                    return;
+
+                if (value < 30)
+                    throw new ArgumentOutOfRangeException(nameof(Width), value, "Width must be greater or equal than 30.");
+
+                grid.Width = value;
+                InitLayout();
+            }
+        }
+
         new public double Height { get => _height; }
+
+        #endregion
+
+        #region Events
 
         /// <summary>
         /// Occurs, when control state changed (checked: true or false).
         /// </summary>
         public event EventHandler StateChanged;
         /// <summary>
-        /// Occurs, when knob position in control changed (Offset value from 0 to 100).
+        /// Occurs, when knob position in control changed (Offset value from 0.0 to 100.0).
         /// </summary>
         public event EventHandler ValueChanged;
 
@@ -78,10 +153,14 @@ namespace SwitchApp
             ValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private string _text;
+        #endregion
+
+        #region Fields
+
+        //private string _text;
         private bool _checked;
         private Color _backgroundColor;
-        private Thickness _padding;
+        //private Thickness _padding;
         private Point? _knobLastPos;
 
         private double _width;
@@ -94,12 +173,39 @@ namespace SwitchApp
         private double _knobMaxX;
         private Color _knobColor;
 
+        private double _knobMinWidth;
+        private double _knobMaxWidth;
+
+        private bool _animLeft;
+        private bool _animRight;
+
+
         private static readonly TimeSpan AnimDurationMoveKnob = TimeSpan.FromSeconds(0.1);
         private static readonly TimeSpan AnimDurationFreeKnob = TimeSpan.FromSeconds(0.5);
 
-        private double _knobMinWidth;
-        private double _knobMaxWidth;
         private double CurrKnobMaxWidth => _knobMaxWidth - knobTransform.X;
+
+        #endregion
+
+        #region Private Methods
+
+        private void SetKnobPositionByChecked()
+        {
+            if (_checked)
+                knobTransform.X = _knobMaxX;
+            else
+                knobTransform.X = _knobMinX;
+        }
+
+
+
+        #endregion
+
+        #region Event Handlers
+
+        #endregion
+
+        #region Constructors
 
         public SwitchControl()
         {
@@ -115,16 +221,57 @@ namespace SwitchApp
             //grid.SizeChanged += Grid_PointerMoved;
             //grid.PointerEntered += Rectangle_PointerEntered;
             //grid.PointerExited += Rectangle_PointerExited;
-            Loaded += SwitchControl_Loaded;
-        }
+            //Loaded += SwitchControl_Loaded;
 
-        private void SwitchControl_Loaded(object sender, RoutedEventArgs e)
-        {
             storyboardShine.Begin();
-
-            RegisterPropertyChangedCallback(WidthProperty, tbChangedCallback);
-            RegisterPropertyChangedCallback(HeightProperty, tbChangedCallback);
         }
+
+        private void InitLayout()
+        {
+            _width = grid.Width;
+            _height = _width / 3;
+            _cornerRadius = _height / 2;
+
+            _knobSize = _height / 1.25;
+            _knobRadius = _knobSize / 2;
+            _knobPadding = (_height - _knobSize) / 2;
+            _knobMinX = 0.0;
+            _knobMaxX = _width - (_knobSize + _knobPadding * 2);
+            _knobColor = knobGS2.Color;
+
+            _knobMinWidth = _knobSize;
+            _knobMaxWidth = _width - (_knobPadding * 2);
+
+            grid.Height = _height;
+            grid.CornerRadius = new CornerRadius(_cornerRadius);
+
+            knob.Width = knob.Height = _knobSize;
+            knob.RadiusX = knob.RadiusY = _knobRadius;
+            knob.Margin = new Thickness(_knobPadding);
+
+            shineRect.Width = shineRect.Height = _height;
+            shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
+            shineKeyFrame.Value = _width + _height;
+            textBlock.FontSize = Math.Max(10, _width / 7.5);
+
+            if (DropShadowPanel.IsSupported)
+            {
+                double shadowOffset = Math.Max(1.0, _knobSize / 5.0);
+                knobShadow.OffsetX = shadowOffset;
+                knobShadow.OffsetY = shadowOffset;
+                knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
+            }
+
+            SetKnobPositionByChecked();
+        }
+
+        #endregion
+
+        #region Initialization
+
+
+
+        #endregion
 
         private void Grid_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
@@ -137,9 +284,6 @@ namespace SwitchApp
                 _knobLastPos = currPos;
             }
         }
-
-        private bool _animLeft;
-        private bool _animRight;
 
         private void SetKnobPosition(double x)
         {
@@ -249,10 +393,10 @@ namespace SwitchApp
                 //storyboardConstriction.Duration = AnimDurationFreeKnob;
                 //storyboardWidth.Duration = AnimDurationFreeKnob;
 
-                if (Offset >= 50)
-                    SetKnobPosition(_width);
-                else
-                    SetKnobPosition(0);
+                //if (Offset >= 50)
+                //    SetKnobPosition(_width);
+                //else
+                //    SetKnobPosition(0);
 
                 _knobLastPos = null;
                 //double value = 100 * knobTransform.X / _knobMaxX;
@@ -277,66 +421,6 @@ namespace SwitchApp
             }
         }
 
-        private void InitLayout()
-        {
-            _width = grid.Width;
-            _height = _width / 3;
-            _cornerRadius = _height / 2;
-
-            _knobSize = _height / 1.25;
-            _knobRadius = _knobSize / 2;
-            _knobPadding = (_height - _knobSize) / 2;
-            _knobMinX = 0.0;// _knobPadding;
-            _knobMaxX = _width - (_knobSize + _knobPadding * 2);
-            _knobColor = knobGS2.Color;
-
-            _knobMinWidth = _knobSize;
-            _knobMaxWidth = _width - (_knobPadding * 2);
-
-            grid.Height = _height;
-            grid.CornerRadius = new CornerRadius(_cornerRadius);
-
-            knob.Width = knob.Height = _knobSize;
-            knob.RadiusX = knob.RadiusY = _knobRadius;
-            knob.Margin = new Thickness(_knobPadding);
-            KnobPadding = _knobPadding;//new Thickness(_knobPadding);
-
-            shineRect.Width = shineRect.Height = _height;
-            shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
-            shineKeyFrame.Value = _width + _height;
-            textBlock.FontSize = Math.Max(10, _width / 7.5);
-
-            if (DropShadowPanel.IsSupported)
-            {
-                double shadowOffset = Math.Max(1.0, _knobSize / 5.0);
-                knobShadow.OffsetX = shadowOffset;
-                knobShadow.OffsetY = shadowOffset;
-                knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
-            }
-
-            knobTransform.X = 0;// _knobMaxX;
-        }
-
-        private void tbChangedCallback(DependencyObject sender, DependencyProperty dp)
-        {
-            if (dp == Rectangle.WidthProperty)
-            {
-
-            }
-            else if (dp == Rectangle.HeightProperty)
-            {
-
-            }
-            else if (dp == Rectangle.RadiusXProperty)
-            {
-
-            }
-            else if (dp == Rectangle.RadiusYProperty)
-            {
-
-            }
-        }
-
         private void knob_Loaded(object sender, RoutedEventArgs e)
         {
             if (DropShadowPanel.IsSupported)
@@ -355,7 +439,7 @@ namespace SwitchApp
 
         #region Filling/Unfilling knob animation
 
-        bool _isFilling;
+        private bool _isFilling;
 
         private void FillingKnob(PointerRoutedEventArgs e)
         {
