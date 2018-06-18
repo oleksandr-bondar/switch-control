@@ -43,10 +43,10 @@
             <Storyboard x:Name="storyboardUnfilling">
                 <ColorAnimation x:Name="storyboardUnfillingAnim" 
                                 Storyboard.TargetName="knobGS1" Storyboard.TargetProperty="Color"
-                                EnableDependentAnimation="True" Duration="0:0:0.5" />
+                                EnableDependentAnimation="True" Duration="0:0:1" />
                 <ColorAnimation x:Name="storyboardUnfillingAnim2" 
                                 Storyboard.TargetName="knobGS2" Storyboard.TargetProperty="Color"
-                                EnableDependentAnimation="True" Duration="0:0:0.5" />
+                                EnableDependentAnimation="True" Duration="0:0:1" />
             </Storyboard>
             
             <Storyboard x:Name="storyboardMove">
