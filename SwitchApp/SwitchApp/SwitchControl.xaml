@@ -8,7 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="50"
-    d:DesignWidth="150">
+    d:DesignWidth="150"
+    x:Name="userControl">
 
     <Grid x:Name="grid" CornerRadius="25" Background="Orange" Width="150" Height="50">
         <Grid.Resources>
@@ -49,13 +50,6 @@
                                 EnableDependentAnimation="True" Duration="0:0:1" />
             </Storyboard>
             
-            <Storyboard x:Name="storyboardMove">
-                <DoubleAnimation x:Name="storyboardMoveAnim"
-                   Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
-                </DoubleAnimation>
-            </Storyboard>
-            
             <Storyboard x:Name="storyboardWidth">
                 <DoubleAnimation x:Name="storyboardWidthAnim"
                    Storyboard.TargetName="knob" Storyboard.TargetProperty="Width" 
@@ -75,6 +69,14 @@
                 </DoubleAnimation>
             </Storyboard>
             
+            <Storyboard x:Name="storyboardFreeKnob">
+                <DoubleAnimation x:Name="storyboardFreeKnobAnim"
+                    Storyboard.TargetName="userControl" Storyboard.TargetProperty="KnobPosition"
+                    EnableDependentAnimation="True"
+                    Duration="0:0:0.25">
+                </DoubleAnimation>
+            </Storyboard>
+
             <Style x:Key="DisabledControl" TargetType="FrameworkElement">
                 <Setter Property="AllowFocusOnInteraction" Value="False" />
                 <Setter Property="IsDoubleTapEnabled" Value="False" />
