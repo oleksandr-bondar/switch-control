@@ -156,13 +156,11 @@ namespace SwitchApp
 
         #endregion
 
-        #region Private Fields
+        #region Private Fields/Properties
 
-        //private string _text;
-        //private Thickness _padding;
         private bool _checked;
         private Color _backgroundColor;
-        private double? _knobLastPosX;
+        private double _knobLastPosX;
 
         private double _width;
         private double _height;
@@ -180,6 +178,20 @@ namespace SwitchApp
         private bool _animLeft;
         private bool _animRight;
 
+        private bool _isFillingKnob;
+        private bool _captureKnob;
+        private bool _freeKnobAnimation;
+
+        private static readonly List<Point> FillingPnts = new List<Point>()
+        {
+            // 4 sides of square
+            new Point(0, 0), new Point(1, 0),
+            new Point(0, 1), new Point(1, 1),
+            // 4 sides of circumcircle
+            new Point(0.5, -0.2), new Point(1.2, 0.5),
+            new Point(0.5, 1.2), new Point(-0.2, 0.5)
+        };
+
         private double CurrKnobMaxWidth => _knobMaxWidth - knobTransform.X;
 
         #endregion
@@ -194,106 +206,9 @@ namespace SwitchApp
                 knobTransform.X = _knobMinX;
         }
 
-
-
-        #endregion
-
-        #region Constructors
-
-        public SwitchControl()
-        {
-            this.InitializeComponent();
-            InitLayout();
-
-            knob.PointerPressed += Knob_PointerPressed;
-            knob.PointerReleased += Knob_PointerReleased;
-            PointerReleased += Knob_PointerReleased;
-            PointerExited += Knob_PointerReleased;
-
-            PointerMoved += Grid_PointerMoved;
-            //grid.SizeChanged += Grid_PointerMoved;
-            //grid.PointerEntered += Rectangle_PointerEntered;
-            //grid.PointerExited += Rectangle_PointerExited;
-            //Loaded += SwitchControl_Loaded;
-
-            storyboardShine.Begin();
-        }
-
-        private void InitLayout()
-        {
-            _width = grid.Width;
-            _height = _width / 3;
-            _cornerRadius = _height / 2;
-
-            _knobSize = _height / 1.25;
-            _knobRadius = _knobSize / 2;
-            _knobPadding = (_height - _knobSize) / 2;
-            _knobMinX = 0.0;
-            _knobMaxX = _width - (_knobSize + _knobPadding * 2);
-            _knobColor = knobGS2.Color;
-
-            _knobMinWidth = _knobSize;
-            _knobMaxWidth = _width - (_knobPadding * 2);
-
-            grid.Height = _height;
-            grid.CornerRadius = new CornerRadius(_cornerRadius);
-
-            knob.Width = knob.Height = _knobSize;
-            knob.RadiusX = knob.RadiusY = _knobRadius;
-            knob.Margin = new Thickness(_knobPadding);
-
-            shineRect.Width = shineRect.Height = _height;
-            shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
-            shineKeyFrame.Value = _width + _height;
-            textBlock.FontSize = Math.Max(10, _width / 7.5);
-
-            if (DropShadowPanel.IsSupported)
-            {
-                double shadowOffset = 3 + _knobPadding;
-
-                knobShadow.OffsetX = shadowOffset;
-                knobShadow.OffsetY = shadowOffset;
-                knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
-            }
-
-            SetKnobPositionByChecked();
-        }
-
-        #endregion
-
-        #region Initialization
-
-        private void knob_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (DropShadowPanel.IsSupported)
-            {
-                var hostVisual = ElementCompositionPreview.GetElementVisual(knob);
-                var compositor = hostVisual.Compositor;
-                var spriteVisual = compositor.CreateSpriteVisual();
-
-                // Make sure size of shadow host and shadow visual always stay in sync
-                var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
-                bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
-
-                spriteVisual.StartAnimation("Size", bindSizeAnimation);
-            }
-        }
-
-        #endregion
-
-        #region Event Handlers
-
-        #endregion
-
-        private void Grid_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {
-            if (_knobLastPosX.HasValue)
-                SetKnobPosition(e.GetCurrentPoint(grid).Position.X);
-        }
-
         private void SetKnobPosition(double x)
         {
-            double diff = (_knobLastPosX.Value - x);
+            double diff = (_knobLastPosX - x);
             Debug.WriteLine($"x: {x} | diff: {diff}");
 
             if (Math.Abs(diff) < 1)
@@ -373,14 +288,136 @@ namespace SwitchApp
             OnValueChanged(KnobOffset);
         }
 
-        private void SetKnobPositionAnimation()
+        #endregion
+
+        #region Constructors
+
+        public SwitchControl()
         {
-            storyboardMove.Stop();
+            this.InitializeComponent();
+            InitLayout();
 
-            storyboardMoveAnim.From = knobTransform.X;
-            storyboardMoveAnim.To = (KnobOffset >= 50 ? _knobMaxX : _knobMinX);
+            knob.PointerPressed += Knob_PointerPressed;
 
-            storyboardMove.Begin();
+            knob.PointerReleased += Knob_PointerReleased;
+            PointerReleased += Knob_PointerReleased;
+            PointerExited += Knob_PointerReleased;
+
+            PointerMoved += Grid_PointerMoved;
+
+            storyboardFreeKnob.Completed += StoryboardFreeKnob_Completed;
+            storyboardShine.Begin();
+        }
+
+        private void InitLayout()
+        {
+            _width = grid.Width;
+            _height = _width / 3;
+            _cornerRadius = _height / 2;
+
+            _knobSize = _height / 1.25;
+            _knobRadius = _knobSize / 2;
+            _knobPadding = (_height - _knobSize) / 2;
+            _knobMinX = 0.0;
+            _knobMaxX = _width - (_knobSize + _knobPadding * 2);
+            _knobColor = knobGS2.Color;
+
+            _knobMinWidth = _knobSize;
+            _knobMaxWidth = _width - (_knobPadding * 2);
+
+            grid.Height = _height;
+            grid.CornerRadius = new CornerRadius(_cornerRadius);
+
+            knob.Width = knob.Height = _knobSize;
+            knob.RadiusX = knob.RadiusY = _knobRadius;
+            knob.Margin = new Thickness(_knobPadding);
+
+            shineRect.Width = shineRect.Height = _height;
+            shineRect.Margin = new Thickness(-_height, 0.0, 0.0, 0.0);
+            shineKeyFrame.Value = _width + _height;
+            textBlock.FontSize = Math.Max(10, _width / 7.5);
+
+            if (DropShadowPanel.IsSupported)
+            {
+                double shadowOffset = 3 + _knobPadding;
+
+                knobShadow.OffsetX = shadowOffset;
+                knobShadow.OffsetY = shadowOffset;
+                knobShadow.BlurRadius = Math.Max(9, _knobSize / 3.0);
+            }
+
+            SetKnobPositionByChecked();
+        }
+
+        private void knob_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DropShadowPanel.IsSupported)
+            {
+                var hostVisual = ElementCompositionPreview.GetElementVisual(knob);
+                var compositor = hostVisual.Compositor;
+                var spriteVisual = compositor.CreateSpriteVisual();
+
+                // Make sure size of shadow host and shadow visual always stay in sync
+                var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+                bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
+
+                spriteVisual.StartAnimation("Size", bindSizeAnimation);
+            }
+        }
+
+        #endregion
+
+        #region KnobPosition (DependencyProperty)
+
+        internal static readonly DependencyProperty KnobPositionProperty =
+            DependencyProperty.Register("KnobPosition", typeof(Double), typeof(SwitchControl),
+                new PropertyMetadata(Double.NaN, new PropertyChangedCallback(OnKnobPositionChanged)));
+
+        internal static void OnKnobPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SwitchControl sw)
+            {
+                sw.SetKnobPosition((double)e.NewValue);
+            }
+        }
+
+        internal double KnobPosition
+        {
+            get => (double)GetValue(KnobPositionProperty);
+            set => SetValue(KnobPositionProperty, value);
+        }
+
+        #endregion
+
+        #region Knob Move Animation
+
+        private void FreeKnob()
+        {
+            if (_captureKnob)
+            {
+                _captureKnob = false;
+                _freeKnobAnimation = true;
+
+                storyboardFreeKnobAnim.From = _knobLastPosX;
+                storyboardFreeKnobAnim.To = (KnobOffset >= 50 ? _width : 0.0);
+
+                storyboardFreeKnob.Begin();
+            }
+        }
+
+        private void CaptureKnob(PointerRoutedEventArgs e)
+        {
+            if (!_captureKnob && !_freeKnobAnimation)
+            {
+                _knobLastPosX = e.GetCurrentPoint(grid).Position.X;
+                _captureKnob = true;
+            }
+        }
+
+        private void Grid_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            if (_captureKnob)
+                SetKnobPosition(e.GetCurrentPoint(grid).Position.X);
         }
 
         private void Knob_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -393,34 +430,24 @@ namespace SwitchApp
             FreeKnob();
         }
 
-        private void FreeKnob()
+        private void StoryboardFreeKnob_Completed(object sender, object e)
         {
-            if (_knobLastPosX.HasValue)
-            {
-                _knobLastPosX = null;
-            }
+            _checked = (KnobOffset >= 50);
+            _freeKnobAnimation = false;
+
+            OnStateChanged();
         }
 
-        private void CaptureKnob(PointerRoutedEventArgs e)
-        {
-            if (!_knobLastPosX.HasValue)
-            {
-                _knobLastPosX = e.GetCurrentPoint(grid).Position.X;
-            }
-        }
+        #endregion
 
         #region Filling/Unfilling knob animation
 
-        private bool _isFilling;
-
         private void FillingKnob(PointerRoutedEventArgs e)
         {
-            Debug.WriteLine("FillingKnob");
-
-            if (_isFilling)
+            if (_isFillingKnob)
                 return;
 
-            _isFilling = true;
+            _isFillingKnob = true;
 
             Point knobPnt = e.GetCurrentPoint(knob).Position;
             double knobOffsetX = knobPnt.X / knob.Width;
@@ -429,35 +456,10 @@ namespace SwitchApp
             Point startPnt = new Point(knobOffsetX, knobOffsetY);
             knobGradient.StartPoint = startPnt;
 
-            Point leftTop = new Point(0, 0);
-            Point leftRight = new Point(1, 0);
-            Point bottomLeft = new Point(0, 1);
-            Point bottomRight = new Point(1, 1);
-
-            List<Point> pnts = new List<Point>()
-            {
-                leftTop, leftRight,
-                bottomLeft, bottomRight,
-                // 4 sides of circumcircle
-                new Point(0.5, -0.2), new Point(1.2, 0.5),
-                new Point(0.5, 1.2), new Point(-0.2, 0.5)
-            };
-
-            //const double radius = 2.0;
-            //const double step = Math.PI * 2.0 / 180;
-
-            //for (double radians = 0; radians < Math.PI * 2.0; radians += step)
-            //{
-            //    double x = radius * Math.Cos(radians);
-            //    double y = radius * Math.Sin(radians);
-
-            //    pnts.Add(new Point(x, y));
-            //}
-
             Point endPnt;
             double maxDistance = 0;
 
-            foreach (var pnt in pnts)
+            foreach (Point pnt in FillingPnts)
             {
                 double dx = pnt.X - startPnt.X;
                 double dy = pnt.Y - startPnt.Y;
@@ -492,12 +494,10 @@ namespace SwitchApp
 
         private void UnfillingKnob()
         {
-            Debug.WriteLine("UnfillingKnob");
-
-            if (!_isFilling)
+            if (!_isFillingKnob)
                 return;
 
-            _isFilling = false;
+            _isFillingKnob = false;
 
             storyboardUnfillingAnim.From = knobGS1.Color;
             storyboardUnfillingAnim.To = _knobColor;
