@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -25,6 +26,16 @@ namespace SwitchApp
         public MainPage()
         {
             this.InitializeComponent();
+        }
+
+        private void SwitchControl_ValueChanged(object sender, double e)
+        {
+            Debug.WriteLine("Value: " + e.ToString("F2"));
+        }
+
+        private void SwitchControl_StateChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine("State: " + checkbox.Checked.ToString());
         }
     }
 }
