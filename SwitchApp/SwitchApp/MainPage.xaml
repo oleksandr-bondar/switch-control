@@ -10,14 +10,10 @@
 
     <Grid Background="LightBlue">
         <Grid Background="LightBlue" HorizontalAlignment="Center" VerticalAlignment="Center" Width="450" Height="600">
-            <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Top"
-                      Width="450" />
-
-            <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Center"
-                      Width="150" BackgroundColor="Red"/>
-
-            <local:SwitchControl HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                      Width="300" BackgroundColor="Blue"/>
+            <local:SwitchControl x:Name="checkbox" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Width="300"
+                        ValueChanged="SwitchControl_ValueChanged" 
+                        StateChanged="SwitchControl_StateChanged"/>
         </Grid>
     </Grid>
 </Page>

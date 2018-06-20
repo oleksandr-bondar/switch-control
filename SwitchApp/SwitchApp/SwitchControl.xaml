@@ -8,7 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="50"
-    d:DesignWidth="150">
+    d:DesignWidth="150"
+    x:Name="userControl">
 
     <Grid x:Name="grid" CornerRadius="25" Background="Orange" Width="150" Height="50">
         <Grid.Resources>
@@ -43,30 +44,39 @@
             <Storyboard x:Name="storyboardUnfilling">
                 <ColorAnimation x:Name="storyboardUnfillingAnim" 
                                 Storyboard.TargetName="knobGS1" Storyboard.TargetProperty="Color"
-                                EnableDependentAnimation="True" Duration="0:0:0.5" />
+                                EnableDependentAnimation="True" Duration="0:0:1" />
                 <ColorAnimation x:Name="storyboardUnfillingAnim2" 
                                 Storyboard.TargetName="knobGS2" Storyboard.TargetProperty="Color"
-                                EnableDependentAnimation="True" Duration="0:0:0.5" />
+                                EnableDependentAnimation="True" Duration="0:0:1" />
             </Storyboard>
             
-            <Storyboard x:Name="storyboardMove">
-                <DoubleAnimation x:Name="storyboardMoveAnim"
-                   Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
+            <Storyboard x:Name="storyboardWidth">
+                <DoubleAnimation x:Name="storyboardWidthAnim"
+                   Storyboard.TargetName="knob" Storyboard.TargetProperty="Width" 
+                   Duration="0:0:0.1" EnableDependentAnimation="True" FillBehavior="HoldEnd">
                 </DoubleAnimation>
             </Storyboard>
 
             <Storyboard x:Name="storyboardConstriction">
                 <DoubleAnimation x:Name="storyboardConstrictionAnimX"
                    Storyboard.TargetName="knobTransform" Storyboard.TargetProperty="X" 
-                   Duration="0:0:0.5" EnableDependentAnimation="True" SpeedRatio="2.0">
+                   Duration="0:0:0.1" EnableDependentAnimation="True" FillBehavior="HoldEnd">
                 </DoubleAnimation>
-                <DoubleAnimation x:Name="storyboardConstrictionAnim2Width"
+                
+                <DoubleAnimation x:Name="storyboardConstrictionAnimWidth"
                     Storyboard.TargetName="knob" Storyboard.TargetProperty="Width"
-                    Duration="0:0:1" EnableDependentAnimation="True">
+                    Duration="0:0:0.1" EnableDependentAnimation="True" FillBehavior="HoldEnd">
                 </DoubleAnimation>
             </Storyboard>
             
+            <Storyboard x:Name="storyboardFreeKnob">
+                <DoubleAnimation x:Name="storyboardFreeKnobAnim"
+                    Storyboard.TargetName="userControl" Storyboard.TargetProperty="KnobPosition"
+                    EnableDependentAnimation="True"
+                    Duration="0:0:0.25">
+                </DoubleAnimation>
+            </Storyboard>
+
             <Style x:Key="DisabledControl" TargetType="FrameworkElement">
                 <Setter Property="AllowFocusOnInteraction" Value="False" />
                 <Setter Property="IsDoubleTapEnabled" Value="False" />
@@ -107,11 +117,7 @@
             </controls:DropShadowPanel.RenderTransform>
             <Rectangle x:Name="knob" Width="40" Height="40" Margin="5" Loaded="knob_Loaded" 
                        PointerEntered="knob_PointerEntered" PointerExited="knob_PointerExited"
-                        RadiusX="20" RadiusY="20" HorizontalAlignment="Left" 
-                       Stretch="Fill">
-                <!--<Rectangle.RenderTransform>
-                    <TranslateTransform x:Name="knobTransform" />
-                </Rectangle.RenderTransform>-->
+                        RadiusX="20" RadiusY="20" HorizontalAlignment="Left">
                 <Rectangle.Fill>
                     <LinearGradientBrush x:Name="knobGradient" StartPoint="0,0" EndPoint="1,1">
                         <GradientStop x:Name="knobGS1" Color="Black" Offset="0.0" />
