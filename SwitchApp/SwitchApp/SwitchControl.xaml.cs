@@ -209,7 +209,6 @@ namespace SwitchApp
         private void SetKnobPosition(double x)
         {
             double diff = (_knobLastPosX - x);
-            Debug.WriteLine($"x: {x} | diff: {diff}");
 
             if (Math.Abs(diff) < 1)
                 return;
@@ -219,7 +218,6 @@ namespace SwitchApp
                 if (_animLeft)
                 {
                     storyboardWidth.Stop();
-
                     knob.Width = storyboardWidthAnim.To.Value;
 
                     _animLeft = false;
@@ -229,21 +227,17 @@ namespace SwitchApp
 
                 if (newWidth > CurrKnobMaxWidth)
                     newWidth = CurrKnobMaxWidth;
-                else if (newWidth < _knobMinWidth)
-                    newWidth = _knobMinWidth;
 
                 if (knob.Width == newWidth)
                     return;
 
                 knob.Width = newWidth;
 
-                storyboardConstrictionAnimWidth.From = knob.Width;
-
-                if (!storyboardConstrictionAnimWidth.To.HasValue)
-                    storyboardConstrictionAnimWidth.To = _knobMinWidth;
+                storyboardConstrictionAnimWidth.From = newWidth;
+                storyboardConstrictionAnimWidth.To = _knobMinWidth;
 
                 storyboardConstrictionAnimX.From = knobTransform.X;
-                storyboardConstrictionAnimX.To = knobTransform.X + (knob.Width - _knobMinWidth);
+                storyboardConstrictionAnimX.To = knobTransform.X + (newWidth - _knobMinWidth);
 
                 storyboardConstriction.Begin();
                 _animRight = true;
@@ -276,9 +270,7 @@ namespace SwitchApp
                 knob.Width = newWidth;
 
                 storyboardWidthAnim.From = knob.Width;
-
-                if (!storyboardWidthAnim.To.HasValue)
-                    storyboardWidthAnim.To = _knobMinWidth;
+                storyboardWidthAnim.To = _knobMinWidth;
 
                 storyboardWidth.Begin();
                 _animLeft = true;
